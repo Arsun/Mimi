@@ -21,7 +21,7 @@
             android:background="#6fcde8">
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/et_login_password"
+                android:id="@+id/til_login_password"
                 app:layout_widthPercent="50%"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -31,32 +31,34 @@
                 app:hintTextAppearance="@style/TextAppearance.AppCompat.hint"
                 android:layout_margin="10dp">
                 <EditText
+                    android:id="@+id/et_login_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPassword"
                     android:hint="Password"
+                    android:inputType="textPassword"
+                    android:lines="1"
                     android:textColor="#ffffff"
                     app:theme="@style/MyEditText"
-                    android:lines="1"
                     android:textSize="20sp"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/et_login_account"
+                android:id="@+id/til_login_account"
                 app:layout_widthPercent="50%"
                 android:layout_height="wrap_content"
                 android:textColorHint="#ffffff"
                 app:hintTextAppearance="@style/TextAppearance.AppCompat.hint"
-                android:layout_above="@id/et_login_password"
+                android:layout_above="@id/til_login_password"
                 android:layout_centerInParent="true"
                 android:layout_margin="10dp">
                 <EditText
+                    android:id="@+id/et_login_account"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Account"
+                    android:lines="1"
                     android:textColor="@android:color/white"
                     app:theme="@style/MyEditText"
-                    android:lines="1"
                     android:textSize="20sp"/>
             </android.support.design.widget.TextInputLayout>
 
@@ -64,7 +66,7 @@
                 android:id="@+id/btn_login"
                 app:layout_widthPercent="40%"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/et_login_password"
+                android:layout_below="@id/til_login_password"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="20dp"
                 android:padding="10dp"
