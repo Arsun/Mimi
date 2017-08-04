@@ -43,8 +43,7 @@
             app:btn_fill_color="@android:color/holo_green_dark"
             app:siShape="@drawable/ic_home_white_18dp"
             />
-
-        <
+        
 
 
     </android.support.percent.PercentRelativeLayout>
