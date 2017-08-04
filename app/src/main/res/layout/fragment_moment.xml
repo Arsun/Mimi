@@ -4,11 +4,6 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Moment Fragment"
-        />
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/srl_refresh_moment"
@@ -19,10 +14,13 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_moment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             />
 
+
     </android.support.v4.widget.SwipeRefreshLayout>
+
+
 
 
 </LinearLayout>

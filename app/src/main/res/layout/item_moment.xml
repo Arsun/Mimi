@@ -4,47 +4,59 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardElevation="10dp"
-    android:layout_margin="10dp">
+    android:layout_margin="10dp"
+    app:cardCornerRadius="10dp"
+    >
 
     <android.support.percent.PercentRelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="?attr/selectableItemBackgroundBorderless"
         >
 
         <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:id="@+id/civ_moment_portrait"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:padding="@dimen/padding_normal"
             android:src="@drawable/zs"
-            app:layout_heightPercent="10%"
-            app:layout_widthPercent="10%"
             />
 
         <TextView
             android:id="@+id/tv_moment_text"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_toRightOf="@id/civ_moment_portrait"
             android:height="200dp"
             android:gravity="center"
             android:padding="@dimen/padding_normal"
             android:text="正文"
+            android:background="?attr/selectableItemBackgroundBorderless"
             />
 
         <com.sackcentury.shinebuttonlib.ShineButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:id="@+id/sb_like_button"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_alignLeft="@id/tv_moment_text"
             android:layout_below="@id/tv_moment_text"
-            android:src="@android:color/darker_gray"
             app:allow_random_color="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:color/darker_gray"
             app:btn_color="@android:color/darker_gray"
             app:btn_fill_color="@android:color/holo_green_dark"
-            app:siShape="@drawable/ic_home_white_18dp"
+            app:siShape="@raw/heart"
             />
-        
 
+        <org.scau.mimi.other.MultiScrollNumber
+            android:id="@+id/msn_like_number"
+            android:layout_width="30dp"
+            android:layout_height="20dp"
+            android:layout_toRightOf="@id/sb_like_button"
+            android:layout_alignBaseline="@id/sb_like_button"
+            android:layout_alignBottom="@id/sb_like_button"
+            app:number_size="20"/>
 
     </android.support.percent.PercentRelativeLayout>
 
