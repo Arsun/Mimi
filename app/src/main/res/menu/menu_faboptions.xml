@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <item
+        android:id="@+id/activity_main_menu_chat"
+        android:icon="@drawable/ic_chat_white_18dp"
+        android:title="chat"
+        />
+
+    <item
+        android:id="@+id/activity_main_menu_moment"
+        android:icon="@drawable/ic_insert_photo_white_18dp"
+        android:title="moment"
+        />
+
+    <item
+        android:id="@+id/activity_main_menu_personal"
+        android:icon="@drawable/ic_perm_identity_white_18dp"
+        android:title="personality"/>
+
+    <item
+        android:id="@+id/activity_main_menu_settings"
+        android:icon="@drawable/ic_settings_white_18dp"
+        android:title="settings"/>
+
+</menu>

@@ -17,4 +17,9 @@
         <item name="colorControlActivated">@android:color/white</item>
     </style>
 
+    <style name="NavTextStyle" parent="TextAppearance.AppCompat.Menu">
+        <item name="android:textSize">30sp</item>
+    </style>
+
+
 </resources>

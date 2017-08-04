@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools">
+
+
+        <item
+            android:id="@+id/nav_menu_home"
+            android:icon="@drawable/ic_home_white_18dp"
+            android:title="call"/>
+
+        <item
+            android:id="@+id/nav_menu_personal"
+            android:icon="@drawable/ic_home_white_18dp"
+            android:title="call"/>
+
+        <item
+            android:id="@+id/nav_menu_search"
+            android:icon="@drawable/ic_home_white_18dp"
+            android:title="call"/>
+
+
+</menu>
