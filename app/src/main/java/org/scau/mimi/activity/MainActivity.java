@@ -147,14 +147,14 @@ public class MainActivity extends AppCompatActivity {
     private void addDefaultFragment() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .add(R.id.rl_fragment_container, new ChatFragment())
+                .add(R.id.fl_fragment_container, new MomentFragment())
                 .commit();
     }
 
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.rl_fragment_container, fragment)
+                .replace(R.id.fl_fragment_container, fragment)
                 .commit();
     }
 }
