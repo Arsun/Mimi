@@ -6,12 +6,14 @@
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
     app:cardCornerRadius="10dp"
+    android:fitsSystemWindows="true"
     >
 
     <android.support.percent.PercentRelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?attr/selectableItemBackgroundBorderless"
+        android:fitsSystemWindows="true"
         >
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -22,6 +24,7 @@
             android:layout_centerVertical="true"
             android:padding="@dimen/padding_normal"
             android:src="@drawable/zs"
+            android:fitsSystemWindows="true"
             />
 
         <TextView
@@ -33,6 +36,7 @@
             android:padding="@dimen/padding_normal"
             android:text="正文"
             android:background="?attr/selectableItemBackgroundBorderless"
+            android:fitsSystemWindows="true"
             />
 
         <com.sackcentury.shinebuttonlib.ShineButton
@@ -47,6 +51,7 @@
             app:btn_color="@android:color/darker_gray"
             app:btn_fill_color="@android:color/holo_green_dark"
             app:siShape="@raw/heart"
+            android:fitsSystemWindows="true"
             />
 
         <org.scau.mimi.other.MultiScrollNumber
@@ -56,7 +61,9 @@
             android:layout_toRightOf="@id/sb_like_button"
             android:layout_alignBaseline="@id/sb_like_button"
             android:layout_alignBottom="@id/sb_like_button"
-            app:number_size="20"/>
+            app:number_size="20"
+            android:fitsSystemWindows="true"
+            />
 
     </android.support.percent.PercentRelativeLayout>
 

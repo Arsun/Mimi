@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.scau.mimi.R;
 import org.scau.mimi.fragment.ChatFragment;
 import org.scau.mimi.fragment.MomentFragment;
+import org.zackratos.ultimatebar.UltimateBar;
 
 import client.yalantis.com.foldingtabbar.FoldingTabBar;
 import q.rorbin.badgeview.QBadgeView;
@@ -40,13 +41,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
+        UltimateBar ultimateBar = new UltimateBar(this);
+        ultimateBar.setImmersionBar();
+//        ultimateBar.setHintBar();
 
         initVariables();
         initViews();
         loadData();
 
-        StatusBarUtil.setColor(this, 0x454e5f, 122);
-
+//        StatusBarUtil.setColor(this, 0x454e5f, 122);
+//        StatusBarUtil.setTransparent(this);
     }
 
     private void initViews() {
