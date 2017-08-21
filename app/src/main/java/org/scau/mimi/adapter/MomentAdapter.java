@@ -12,9 +12,10 @@ import com.sackcentury.shinebuttonlib.ShineButton;
 
 import org.scau.mimi.R;
 import org.scau.mimi.bean.Moment;
-import org.scau.mimi.other.MultiScrollNumber;
 
 import java.util.List;
+
+import sumimakito.android.advtextswitcher.AdvTextSwitcher;
 
 /**
  * Created by 10313 on 2017/8/3.
@@ -28,20 +29,33 @@ public class MomentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     static class NormalViewHolder extends RecyclerView.ViewHolder {
 
         ShineButton mShineButton;
-        MultiScrollNumber mMultiScrollNumber;
         TextView mTextView;
+        AdvTextSwitcher mLikeNumber;
+        AdvTextSwitcher mCommentNumber;
 
         public NormalViewHolder(View itemView) {
             super(itemView);
 
             mShineButton = (ShineButton) itemView.findViewById(R.id.sb_like_button);
-            mMultiScrollNumber = (MultiScrollNumber) itemView.findViewById(R.id.msn_like_number);
             mTextView = (TextView) itemView.findViewById(R.id.tv_moment_text);
+            mLikeNumber = (AdvTextSwitcher) itemView.findViewById(R.id.ats_like_number);
+            mCommentNumber = (AdvTextSwitcher) itemView.findViewById(R.id.ats_comment_number);
         }
 
         public void bind(Moment moment,Context context) {
-            mMultiScrollNumber.setNumber(moment.getLikeCount());
             mShineButton.init((Activity) context);
+
+            mShineButton.setChecked(false);
+            mShineButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mLikeNumber.next();
+                }
+            });
+
+            String[] texts = {"123", "134"};
+            mLikeNumber.setTexts(texts);
+            mCommentNumber.setTexts(texts);
         }
     }
 

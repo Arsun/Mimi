@@ -1,8 +1,9 @@
 package org.scau.mimi.activity;
 
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,11 +11,8 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 
-import com.jaeger.library.StatusBarUtil;
-import com.joaquimley.faboptions.FabOptions;
 import com.nineoldandroids.view.ViewHelper;
 
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +22,6 @@ import org.scau.mimi.fragment.MomentFragment;
 import org.zackratos.ultimatebar.UltimateBar;
 
 import client.yalantis.com.foldingtabbar.FoldingTabBar;
-import q.rorbin.badgeview.QBadgeView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,8 +29,10 @@ public class MainActivity extends AppCompatActivity {
     //Views;
     private ActionBar actionBar;
     private DrawerLayout drawerLayout;
-//    private FabOptions foMenu;
     private FoldingTabBar ftbMenu;
+
+    //Variables
+    private int mOriginFtbMenuTop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +44,10 @@ public class MainActivity extends AppCompatActivity {
         ultimateBar.setImmersionBar();
 //        ultimateBar.setHintBar();
 
+        loadData();
         initVariables();
         initViews();
-        loadData();
+
 
 //        StatusBarUtil.setColor(this, 0x454e5f, 122);
 //        StatusBarUtil.setTransparent(this);
@@ -110,6 +110,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        ftbMenu.post(new Runnable() {
+            @Override
+            public void run() {
+                mOriginFtbMenuTop = ftbMenu.getTop();
+            }
+        });
         ftbMenu.setOnFoldingItemClickListener(new FoldingTabBar.OnFoldingItemSelectedListener() {
             @Override
             public boolean onFoldingItemSelected(@NotNull MenuItem menuItem) {
@@ -131,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         addDefaultFragment();
 
 //        new QBadgeView(this).bindTarget(ftbMenu)
@@ -141,7 +148,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void initVariables() {
-
     }
 
     private void loadData() {
@@ -160,5 +166,42 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager.beginTransaction()
                 .replace(R.id.fl_fragment_container, fragment)
                 .commit();
+    }
+
+    public void setFtbMenuTopAndBottom(int newTop, int newBottom) {
+        ftbMenu.setTop(newTop);
+        ftbMenu.setBottom(newBottom);
+    }
+
+    public int getFtbMenuTop() {
+        return ftbMenu.getTop();
+    }
+
+    public int getFtbMenuBottom() {
+        return ftbMenu.getBottom();
+    }
+
+    public int getOriginFtbMenuTop() {
+        return mOriginFtbMenuTop;
+    }
+
+    public boolean isFtbMenuInScreen() {
+        int width;
+        int height;
+        Point point = new Point();
+        getWindowManager().getDefaultDisplay().getSize(point);
+        width = point.x;
+        height = point.y;
+
+        Rect rect = new Rect(0, 0, width, height);
+
+        if (!ftbMenu.getLocalVisibleRect(rect))
+            return false;
+
+        return true;
+    }
+
+    public void ftbMenuScrollTo(int y) {
+
     }
 }
