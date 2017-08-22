@@ -35,9 +35,10 @@
                     android:hint="Password"
                     android:inputType="textPassword"
                     android:lines="1"
-                    android:textColor="#ffffff"
+                    android:textColor="#12981f"
                     app:theme="@style/MyEditText"
-                    android:textSize="20sp"/>
+                    android:textSize="20sp"
+                    />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -75,7 +76,7 @@
                 android:textSize="18sp"
                 app:cpb_textComplete="success"
                 app:cpb_textError="error"
-                app:cpb_textIdle="upload"
+                app:cpb_textIdle="login"
                 android:background="?android:attr/selectableItemBackground"/>
         </android.support.percent.PercentRelativeLayout>
     </android.support.v7.widget.CardView>

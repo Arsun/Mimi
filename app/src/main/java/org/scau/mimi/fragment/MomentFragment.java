@@ -13,6 +13,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 
 import org.scau.mimi.R;
@@ -72,6 +73,18 @@ public class MomentFragment extends BaseFragment {
         trlRefreshMoment = (TwinklingRefreshLayout) view.findViewById(R.id.trl_refresh_moment);
         rvMoment.setAdapter(new MomentAdapter(mMomentList));
         rvMoment.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        trlRefreshMoment.setOnRefreshListener(new RefreshListenerAdapter() {
+            @Override
+            public void onRefresh(TwinklingRefreshLayout refreshLayout) {
+                super.onRefresh(refreshLayout);
+            }
+
+            @Override
+            public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
+                super.onLoadMore(refreshLayout);
+            }
+        });
 
 //        rvMoment.setOnTouchListener(new View.OnTouchListener() {
 //            @Override

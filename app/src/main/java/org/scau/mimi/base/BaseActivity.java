@@ -20,9 +20,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         addFragment();
 
+        loadData();
         initVariables();
         initViews();
-        loadData();
 
     }
 
