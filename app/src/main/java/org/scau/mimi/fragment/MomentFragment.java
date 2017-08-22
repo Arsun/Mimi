@@ -41,16 +41,23 @@ public class MomentFragment extends BaseFragment {
     //Variables
     private MainActivity mActivity;
     private GestureDetectorCompat mGestureDetectorCompat;
+    private View mRootView;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_moment, container, false);
-        loadData();
-        initList();
-        initVariables();
-        initViews(view);
-        return view;
+        if (mRootView == null) {
+            mRootView = inflater.inflate(R.layout.fragment_moment, container, false);
+            loadData();
+            initList();
+            initVariables();
+            initViews(mRootView);
+        }
+        ViewGroup parent = (ViewGroup) mRootView.getParent();
+        if (parent != null) {
+            parent.removeView(mRootView);
+        }
+        return mRootView;
     }
 
     @Override

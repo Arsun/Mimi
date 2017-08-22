@@ -11,13 +11,16 @@
         android:theme="@style/AppTheme">
         <activity android:name=".activity.LoginActivity">
         </activity>
-        <activity android:name=".activity.MainActivity"
-                  android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+        <activity
+            android:name=".activity.MainActivity"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".activity.SignUpActivity">
         </activity>
     </application>
 
