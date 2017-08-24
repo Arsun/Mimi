@@ -16,4 +16,6 @@ public class Constants {
 
     public static final String LOGIN = "/api/user/login";
 
+    public static final String MESSAGE_LIST = "/api/message/page/";
+
 }

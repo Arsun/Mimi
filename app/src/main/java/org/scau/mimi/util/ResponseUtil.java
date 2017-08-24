@@ -1,5 +1,9 @@
 package org.scau.mimi.util;
 
+import com.google.gson.Gson;
+
+import org.scau.mimi.gson.MessagesInfo;
+
 import java.io.IOException;
 
 import okhttp3.Response;
@@ -18,5 +22,10 @@ public class ResponseUtil {
                   e.printStackTrace();
         }
         return data;
+    }
+
+    public static MessagesInfo getMessagesInfo(String jsonData) {
+        Gson gson = new Gson();
+        return gson.fromJson(jsonData, MessagesInfo.class);
     }
 }
