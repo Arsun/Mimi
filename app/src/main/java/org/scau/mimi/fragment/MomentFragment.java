@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,6 @@ import org.scau.mimi.R;
 import org.scau.mimi.activity.MainActivity;
 import org.scau.mimi.adapter.MomentAdapter;
 import org.scau.mimi.base.BaseFragment;
-import org.scau.mimi.bean.Moment;
 import org.scau.mimi.gson.MessagesInfo;
 import org.scau.mimi.util.HttpUtil;
 import org.scau.mimi.util.ResponseUtil;
@@ -84,7 +82,7 @@ public class MomentFragment extends BaseFragment {
         trlRefreshMoment.setOnRefreshListener(new RefreshListenerAdapter() {
             @Override
             public void onRefresh(TwinklingRefreshLayout refreshLayout) {
-                HttpUtil.getMessageList(nextPage, new Callback() {
+                HttpUtil.requestMessages(nextPage, new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
 
@@ -93,9 +91,21 @@ public class MomentFragment extends BaseFragment {
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
                         MessagesInfo messagesInfo = ResponseUtil
-                                .getMessagesInfo(ResponseUtil.getString(response));
+                                .getMessagesInfo(response);
+                        mMessageList.addAll(0,
+                                messagesInfo.content.messageList
+                        );
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                rvMoment.getAdapter().notifyDataSetChanged();
+                                trlRefreshMoment.finishRefreshing();
+                            }
+                        });
                     }
                 });
+
             }
 
             @Override

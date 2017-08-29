@@ -30,7 +30,7 @@ public class MessagesInfo {
 
             public String content;
 
-            public int tmCreated;
+            public long tmCreated;
 
             public List<MessageImageSet> messageImageSet ;
 
@@ -46,6 +46,8 @@ public class MessagesInfo {
 
             public Location location;
 
+            public boolean isLike;
+
             public class User {
                 public int uid;
 
@@ -53,7 +55,7 @@ public class MessagesInfo {
 
                 public String nname;
 
-                public int tmCreated;
+                public long tmCreated;
             }
 
             public class MessageImageSet {

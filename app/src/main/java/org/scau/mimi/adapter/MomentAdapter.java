@@ -12,8 +12,9 @@ import android.widget.TextView;
 import com.sackcentury.shinebuttonlib.ShineButton;
 
 import org.scau.mimi.R;
-import org.scau.mimi.bean.Moment;
 import org.scau.mimi.gson.MessagesInfo;
+import org.scau.mimi.util.HttpUtil;
+import org.scau.mimi.util.TextUtil;
 
 import java.util.Date;
 import java.util.List;
@@ -40,9 +41,9 @@ public class MomentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         ShineButton sbLikeButton;
         AdvTextSwitcher atsLikeNumber;
         AdvTextSwitcher atsCommentNumber;
-        ImageView ivPic0;
-        ImageView ivPic1;
-        ImageView ivPic2;
+        ImageView ivMomentPic0;
+        ImageView ivMomentPic1;
+        ImageView ivMomentPic2;
 
         public NormalViewHolder(View itemView) {
             super(itemView);
@@ -50,40 +51,75 @@ public class MomentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             tvNickname = (TextView) itemView.findViewById(R.id.tv_nickname);
             tvPostTime = (TextView) itemView.findViewById(R.id.tv_post_time);
             tvLocation = (TextView) itemView.findViewById(R.id.tv_location);
-            tvTextContent = (TextView) itemView.findViewById(R.id.tv_moment_text);
+            tvTextContent = (TextView) itemView.findViewById(R.id.tv_moment_text_content);
             sbLikeButton = (ShineButton) itemView.findViewById(R.id.sb_like_button);
             atsLikeNumber = (AdvTextSwitcher) itemView.findViewById(R.id.ats_like_number);
             atsCommentNumber = (AdvTextSwitcher) itemView.findViewById(R.id.ats_comment_number);
-            ivPic0 = (ImageView) itemView.findViewById(R.id.iv_pic_0);
-            ivPic1 = (ImageView) itemView.findViewById(R.id.iv_pic_1);
-            ivPic2 = (ImageView) itemView.findViewById(R.id.iv_pic_2);
+            ivMomentPic0 = (ImageView) itemView.findViewById(R.id.iv_moment_pic_0);
+            ivMomentPic1 = (ImageView) itemView.findViewById(R.id.iv_moment_pic_1);
+            ivMomentPic2 = (ImageView) itemView.findViewById(R.id.iv_moment_pic_2);
         }
 
-        public void bind(MessagesInfo.Content.Message message, Context context) {
+        public void bind(final MessagesInfo.Content.Message message, Context context) {
 
             if (message.isFake)
                 tvNickname.setText(message.fakeName);
             else
                 tvNickname.setText(message.user.nname);
 
-            tvPostTime.setText(new Date(message.tmCreated).toString());
+            tvPostTime.setText(
+                    TextUtil.dateToString(new Date(message.tmCreated))
+            );
             tvLocation.setText(message.location.locale);
             tvTextContent.setText(message.content);
 
             sbLikeButton.init((Activity) context);
 
-            sbLikeButton.setChecked(false);
+            sbLikeButton.setChecked(message.isLike ? true : false);
+
             sbLikeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    atsLikeNumber.next();
+                    if (sbLikeButton.isChecked()) {
+                        atsLikeNumber.overrideText(String.valueOf(message.likeCount + 1));
+                        message.isLike = true;
+                    } else {
+                        atsLikeNumber.overrideText(String.valueOf(message.likeCount));
+                        message.isLike = false;
+                    }
                 }
             });
 
-            String[] texts = {"123", "134"};
-            atsLikeNumber.setTexts(texts);
-            atsCommentNumber.setTexts(texts);
+
+            atsLikeNumber.setText(String.valueOf(message.likeCount));
+            atsCommentNumber.setText(String.valueOf(message.commentCount));
+
+            List<MessagesInfo.Content.Message.MessageImageSet> imageSetList = message.messageImageSet;
+            if (imageSetList != null) {
+
+                int picNum = imageSetList.size();
+                if (picNum == 3) {
+                    HttpUtil.loadImageByGlide(context, imageSetList.get(0).webPath, ivMomentPic0);
+                    HttpUtil.loadImageByGlide(context, imageSetList.get(1).webPath, ivMomentPic1);
+                    HttpUtil.loadImageByGlide(context, imageSetList.get(2).webPath, ivMomentPic2);
+                } else if (picNum == 2) {
+                    HttpUtil.loadImageByGlide(context, imageSetList.get(0).webPath, ivMomentPic0);
+                    HttpUtil.loadImageByGlide(context, imageSetList.get(1).webPath, ivMomentPic1);
+                    ivMomentPic2.setVisibility(View.GONE);
+                } else if (picNum == 1) {
+                    HttpUtil.loadImageByGlide(context, imageSetList.get(0).webPath, ivMomentPic0);
+                    ivMomentPic1.setVisibility(View.GONE);
+                    ivMomentPic2.setVisibility(View.GONE);
+                } else if (picNum == 0) {
+                    ivMomentPic0.setVisibility(View.GONE);
+                    ivMomentPic1.setVisibility(View.GONE);
+                    ivMomentPic2.setVisibility(View.GONE);
+                }
+
+            }
         }
+
+
     }
 
     public MomentAdapter(List<MessagesInfo.Content.Message> messages) {

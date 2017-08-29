@@ -38,3 +38,5 @@
 
 # for DexGuard only
 -keepresourcexmlelements manifest/application/meta-data@value=GlideModule
+
+-dontwarn com.squareup.picasso.**

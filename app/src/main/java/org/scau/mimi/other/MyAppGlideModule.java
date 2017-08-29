@@ -1,7 +1,7 @@
 package org.scau.mimi.other;
 
-import com.bumptech.glide.annotation.GlideModule;
-import com.bumptech.glide.module.AppGlideModule;
-
-@GlideModule
-public final class MyAppGlideModule extends AppGlideModule {}
+//import com.bumptech.glide.annotation.GlideModule;
+//import com.bumptech.glide.module.AppGlideModule;
+//
+//@GlideModule
+//public final class MyAppGlideModule extends AppGlideModule {}

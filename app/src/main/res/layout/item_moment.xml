@@ -2,20 +2,20 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/margin_normal"
     android:padding="@dimen/padding_small"
     app:cardCornerRadius="10dp"
     android:fitsSystemWindows="true"
-    android:background="?attr/selectableItemBackgroundBorderless"
+    android:clickable="true"
     >
 
     <!--用于做整体布局容器-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/selectableItemBackgroundBorderless"
         android:orientation="horizontal"
         android:fitsSystemWindows="true"
         android:padding="@dimen/padding_small"
@@ -40,24 +40,22 @@
 
 
         <!--右侧-->
-        <LinearLayout
+
+        <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:padding="@dimen/padding_small"
+            tools:targetApi="lollipop">
 
             <!--昵称，时间，地区-->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/padding_small"
-                >
-
                 <TextView
                     android:id="@+id/tv_nickname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
                     android:text="昵称"
                     />
 
@@ -76,90 +74,144 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
                     android:textSize="15sp"
                     android:text="地点"
                     />
 
-            </RelativeLayout>
-
             <!--文字-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/padding_small"
-                >
 
                 <TextView
-                    android:id="@+id/tv_moment_text"
+                    android:id="@+id/tv_moment_text_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="left"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@+id/tv_post_time"
+                    android:gravity="center|start"
                     android:padding="@dimen/padding_normal"
                     android:text="正文"
-                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:maxLength="200"
+                    android:minHeight="100dp"
                     />
 
-            </LinearLayout>
+            <android.support.percent.PercentRelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_small"
+                android:layout_below="@+id/tv_moment_text_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="@dimen/margin_normal"
+                >
+
+                <ImageView
+                    android:id="@+id/iv_moment_pic_0"
+                    app:layout_widthPercent="33%"
+                    android:layout_height="100dp"
+                    android:layout_marginTop="@dimen/margin_normal"
+                    android:layout_marginBottom="@dimen/margin_normal"
+                    android:layout_marginLeft="1dp"
+                    android:layout_marginRight="1dp"
+                    android:background="@android:color/darker_gray"
+                    android:scaleType="centerCrop"
+                    android:clickable="true"
+                    />
+
+                <ImageView
+                    android:id="@+id/iv_moment_pic_1"
+                    app:layout_widthPercent="33%"
+                    android:layout_height="100dp"
+                    android:background="@android:color/darker_gray"
+                    android:layout_marginTop="@dimen/margin_normal"
+                    android:layout_marginBottom="@dimen/margin_normal"
+                    android:layout_marginLeft="1dp"
+                    android:layout_marginRight="1dp"
+                    android:scaleType="centerCrop"
+                    android:clickable="true"
+                    android:layout_toRightOf="@id/iv_moment_pic_0"
+                    />
+
+                <ImageView
+                    android:id="@+id/iv_moment_pic_2"
+                    app:layout_widthPercent="33%"
+                    android:layout_height="100dp"
+                    android:background="@android:color/darker_gray"
+                    android:layout_marginTop="@dimen/margin_normal"
+                    android:layout_marginBottom="@dimen/margin_normal"
+                    android:layout_marginLeft="1dp"
+                    android:layout_marginRight="1dp"
+                    android:scaleType="centerCrop"
+                    android:clickable="true"
+                    android:layout_toRightOf="@id/iv_moment_pic_1"
+                    />
+
+            </android.support.percent.PercentRelativeLayout>
 
             <!--图片-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/padding_small"
-                android:orientation="horizontal"
-                >
+            <!--<LinearLayout-->
+                <!--android:id="@+id/ll_pic_container"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:padding="@dimen/padding_small"-->
+                <!--android:layout_below="@+id/tv_moment_text_content"-->
+                <!--android:orientation="horizontal"-->
+                <!--android:layout_marginBottom="10dp"-->
+                <!--android:layout_marginTop="@dimen/margin_normal"-->
+                <!--&gt;-->
 
-                <ImageView
-                    android:id="@+id/iv_pic_0"
-                    android:layout_width="0dp"
-                    android:layout_height="100dp"
-                    android:layout_weight="1"
-                    android:layout_marginTop="@dimen/margin_normal"
-                    android:layout_marginBottom="@dimen/margin_normal"
-                    android:layout_marginLeft="1dp"
-                    android:layout_marginRight="1dp"
-                    android:src="@drawable/zs"
-                    android:scaleType="centerCrop"
+                <!--<ImageView-->
+                    <!--android:id="@+id/iv_moment_pic_0"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="100dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:layout_marginTop="@dimen/margin_normal"-->
+                    <!--android:layout_marginBottom="@dimen/margin_normal"-->
+                    <!--android:layout_marginLeft="1dp"-->
+                    <!--android:layout_marginRight="1dp"-->
+                    <!--android:background="@android:color/darker_gray"-->
+                    <!--android:scaleType="centerCrop"-->
+                    <!--android:clickable="true"-->
+                    <!--/>-->
 
-                    />
+                <!--<ImageView-->
+                    <!--android:id="@+id/iv_moment_pic_1"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="100dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:background="@android:color/darker_gray"-->
+                    <!--android:layout_marginTop="@dimen/margin_normal"-->
+                    <!--android:layout_marginBottom="@dimen/margin_normal"-->
+                    <!--android:layout_marginLeft="1dp"-->
+                    <!--android:layout_marginRight="1dp"-->
+                    <!--android:scaleType="centerCrop"-->
+                    <!--android:clickable="true"-->
+                    <!--/>-->
 
-                <ImageView
-                    android:id="@+id/iv_pic_1"
-                    android:layout_width="0dp"
-                    android:layout_height="100dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/zs"
-                    android:layout_marginTop="@dimen/margin_normal"
-                    android:layout_marginBottom="@dimen/margin_normal"
-                    android:layout_marginLeft="1dp"
-                    android:layout_marginRight="1dp"
-                    android:scaleType="centerCrop"
+                <!--<ImageView-->
+                    <!--android:id="@+id/iv_moment_pic_2"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="100dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:background="@android:color/darker_gray"-->
+                    <!--android:layout_marginTop="@dimen/margin_normal"-->
+                    <!--android:layout_marginBottom="@dimen/margin_normal"-->
+                    <!--android:layout_marginLeft="1dp"-->
+                    <!--android:layout_marginRight="1dp"-->
+                    <!--android:scaleType="centerCrop"-->
+                    <!--android:clickable="true"-->
+                    <!--/>-->
 
-                    />
-
-                <ImageView
-                    android:id="@+id/iv_pic_2"
-                    android:layout_width="0dp"
-                    android:layout_height="100dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/zs"
-                    android:layout_marginTop="@dimen/margin_normal"
-                    android:layout_marginBottom="@dimen/margin_normal"
-                    android:layout_marginLeft="1dp"
-                    android:layout_marginRight="1dp"
-                    android:scaleType="centerCrop"
-
-                    />
-
-            </LinearLayout>
+            <!--</LinearLayout>-->
 
             <!--点赞，评论，私聊-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/padding_small"
-                android:orientation="horizontal"
-                >
+
+            <!--<LinearLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_below="@id/ll_pic_container"-->
+                <!--android:orientation="horizontal"-->
+                <!--android:layout_alignParentLeft="true"-->
+                <!--android:background="?android:attr/selectableItemBackground"-->
+                <!--&gt;</LinearLayout>-->
 
                 <com.sackcentury.shinebuttonlib.ShineButton
                     android:id="@+id/sb_like_button"
@@ -172,6 +224,8 @@
                     app:btn_color="@android:color/darker_gray"
                     app:btn_fill_color="#ff0000"
                     app:siShape="@raw/heart"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentBottom="true"
                     />
 
                 <sumimakito.android.advtextswitcher.AdvTextSwitcher
@@ -179,20 +233,24 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:textSize="10sp"
+                    android:layout_toRightOf="@+id/sb_like_button"
+                    android:layout_alignParentBottom="true"
                     />
 
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    />
+                <!--<TextView-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_weight="1"-->
+                    <!--/>-->
 
                 <ImageView
+                    android:id="@+id/iv_pic_comment_number"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:src="@drawable/ic_moment_comment"
-                    android:layout_gravity="center_vertical"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignParentBottom="true"
                     />
 
                 <sumimakito.android.advtextswitcher.AdvTextSwitcher
@@ -200,24 +258,30 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:textSize="10sp"
+                    android:layout_toRightOf="@+id/iv_pic_comment_number"
+                    android:layout_alignParentBottom="true"
                     />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    />
+                <!--<TextView-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_weight="1"-->
+                    <!--/>-->
 
                 <ImageButton
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:src="@drawable/ic_moment_chat"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentBottom="true"
+                    />
 
-            </LinearLayout>
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </LinearLayout>
+
+
 
 </android.support.v7.widget.CardView>
