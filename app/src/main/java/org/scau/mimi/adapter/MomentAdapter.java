@@ -2,6 +2,9 @@ package org.scau.mimi.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +15,14 @@ import android.widget.TextView;
 import com.sackcentury.shinebuttonlib.ShineButton;
 
 import org.scau.mimi.R;
+import org.scau.mimi.activity.PictureActivity;
 import org.scau.mimi.gson.MessagesInfo;
+import org.scau.mimi.other.Constants;
 import org.scau.mimi.util.HttpUtil;
+import org.scau.mimi.util.LogUtil;
 import org.scau.mimi.util.TextUtil;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,10 +35,16 @@ import sumimakito.android.advtextswitcher.AdvTextSwitcher;
 
 public class MomentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    private static final String TAG = "MomentAdapter";
+
     private List<MessagesInfo.Content.Message> mMessages;
     private Context mContext;
 
-    static class NormalViewHolder extends RecyclerView.ViewHolder {
+     static class NormalViewHolder extends RecyclerView.ViewHolder {
+
+        String[] mPicUrls;
+        Context mContext;
+
 
         CircleImageView civPortrait;
         TextView tvNickname;
@@ -47,6 +60,7 @@ public class MomentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         public NormalViewHolder(View itemView) {
             super(itemView);
+            mContext = itemView.getContext();
 
             tvNickname = (TextView) itemView.findViewById(R.id.tv_nickname);
             tvPostTime = (TextView) itemView.findViewById(R.id.tv_post_time);
@@ -60,7 +74,13 @@ public class MomentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             ivMomentPic2 = (ImageView) itemView.findViewById(R.id.iv_moment_pic_2);
         }
 
-        public void bind(final MessagesInfo.Content.Message message, Context context) {
+        public void bind(final MessagesInfo.Content.Message message) {
+
+            mPicUrls = new String[message.messageImageSet.size()];
+            for (int i = 0; i < message.messageImageSet.size(); i++) {
+                mPicUrls[i] = Constants.ADDRESS + message.messageImageSet.get(i).webPath;
+            }
+
 
             if (message.isFake)
                 tvNickname.setText(message.fakeName);
@@ -72,8 +92,9 @@ public class MomentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             );
             tvLocation.setText(message.location.locale);
             tvTextContent.setText(message.content);
+            LogUtil.d(TAG, message.content);
 
-            sbLikeButton.init((Activity) context);
+            sbLikeButton.init((Activity) mContext);
 
             sbLikeButton.setChecked(message.isLike ? true : false);
 
@@ -98,16 +119,28 @@ public class MomentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             if (imageSetList != null) {
 
                 int picNum = imageSetList.size();
+                LogUtil.d(TAG, "picNum: " + picNum);
                 if (picNum == 3) {
-                    HttpUtil.loadImageByGlide(context, imageSetList.get(0).webPath, ivMomentPic0);
-                    HttpUtil.loadImageByGlide(context, imageSetList.get(1).webPath, ivMomentPic1);
-                    HttpUtil.loadImageByGlide(context, imageSetList.get(2).webPath, ivMomentPic2);
+                    HttpUtil.loadImageByGlide(mContext, imageSetList.get(0).webPath, ivMomentPic0);
+                    HttpUtil.loadImageByGlide(mContext, imageSetList.get(1).webPath, ivMomentPic1);
+                    HttpUtil.loadImageByGlide(mContext, imageSetList.get(2).webPath, ivMomentPic2);
+                    ivMomentPic0.setVisibility(View.VISIBLE);
+                    ivMomentPic1.setVisibility(View.VISIBLE);
+                    ivMomentPic2.setVisibility(View.VISIBLE);
                 } else if (picNum == 2) {
-                    HttpUtil.loadImageByGlide(context, imageSetList.get(0).webPath, ivMomentPic0);
-                    HttpUtil.loadImageByGlide(context, imageSetList.get(1).webPath, ivMomentPic1);
+                    HttpUtil.loadImageByGlide(mContext, imageSetList.get(0).webPath, ivMomentPic0);
+                    HttpUtil.loadImageByGlide(mContext, imageSetList.get(1).webPath, ivMomentPic1);
+                    ivMomentPic0.setVisibility(View.VISIBLE);
+                    ivMomentPic1.setVisibility(View.VISIBLE);
                     ivMomentPic2.setVisibility(View.GONE);
+                    if (ivMomentPic1.getVisibility() == View.VISIBLE) {
+                        LogUtil.d(TAG, "true");
+                    } else {
+                        LogUtil.d(TAG, "false");
+                    }
                 } else if (picNum == 1) {
-                    HttpUtil.loadImageByGlide(context, imageSetList.get(0).webPath, ivMomentPic0);
+                    HttpUtil.loadImageByGlide(mContext, imageSetList.get(0).webPath, ivMomentPic0);
+                    ivMomentPic0.setVisibility(View.VISIBLE);
                     ivMomentPic1.setVisibility(View.GONE);
                     ivMomentPic2.setVisibility(View.GONE);
                 } else if (picNum == 0) {
@@ -117,8 +150,48 @@ public class MomentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 }
 
             }
-        }
 
+//            ivMomentPic0.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//
+//                    PictureActivity.actionStart(
+//                            (Activity)(mContext)
+//                            , ivMomentPic0
+//                            , mPicUrls
+//                            , new int[]{ ivMomentPic0.getWidth(), ivMomentPic0.getHeight()}
+//                            , 0
+//                    );
+//                }
+//            });
+//
+//            ivMomentPic1.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    PictureActivity.actionStart(
+//                            (Activity)(mContext)
+//                            , ivMomentPic1
+//                            , mPicUrls
+//                            , new int[]{ ivMomentPic1.getWidth(), ivMomentPic1.getHeight()}
+//                            , 1
+//                    );
+//                }
+//            });
+//
+//            ivMomentPic2.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    PictureActivity.actionStart(
+//                            (Activity)(mContext)
+//                            , ivMomentPic2
+//                            , mPicUrls
+//                            , new int[]{ ivMomentPic2.getWidth(), ivMomentPic2.getHeight()}
+//                            , 2
+//                    );
+//                }
+//            });
+
+        }
 
     }
 
@@ -135,7 +208,7 @@ public class MomentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((NormalViewHolder)holder).bind(mMessages.get(position), mContext);
+        ((NormalViewHolder)holder).bind(mMessages.get(position));
     }
 
     @Override

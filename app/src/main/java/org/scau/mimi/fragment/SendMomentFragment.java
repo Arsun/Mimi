@@ -22,7 +22,6 @@ import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,9 +37,11 @@ import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
 
 import org.scau.mimi.R;
+import org.scau.mimi.activity.LoginActivity;
 import org.scau.mimi.activity.MainActivity;
 import org.scau.mimi.base.BaseFragment;
 import org.scau.mimi.gson.ImagesInfo;
+import org.scau.mimi.gson.Info;
 import org.scau.mimi.other.Constants;
 import org.scau.mimi.util.HttpUtil;
 import org.scau.mimi.util.LogUtil;
@@ -72,6 +73,20 @@ public class SendMomentFragment extends BaseFragment {
     private static final int REQUEST_CODE_PERMISSION = 1;
     private static final int REQUEST_CODE_MATISSE = 2;
 
+    //Varibles
+    private String mTextContent;
+    private List<ImageView> mImageViews;
+    private List<ImageButton> mImageButtons;
+    private List<String> mPicBase64Code;
+    private int mLastSelectablePicNum;
+    private List<Bitmap> mPics;
+    private int mLocationId;
+
+
+    //Data
+    private String mNickname;
+    private List<String> mPicPaths;
+
 
     //Views
     private TextView tvNickname;
@@ -87,17 +102,8 @@ public class SendMomentFragment extends BaseFragment {
     private ImageButton ibRemovePic2;
     private ImageButton ibAddPic;
 
-    //Varibles
-    private String mTextContent;
-    private List<ImageView> mImageViews;
-    private List<ImageButton> mImageButtons;
-    private List<String> mPicBase64Code;
-    private int mLastSelectablePicNum;
-    private List<Bitmap> mPics;
 
-    //Data
-    private String mNickname;
-    private int mLocationId;
+
 
 
     @Nullable
@@ -149,6 +155,7 @@ public class SendMomentFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 MainActivity.actionStart(getActivity());
+                getActivity().finish();
             }
         });
 
@@ -333,6 +340,11 @@ public class SendMomentFragment extends BaseFragment {
                     );
                 }
             });
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         new Thread(new Runnable() {
@@ -348,9 +360,22 @@ public class SendMomentFragment extends BaseFragment {
 
                             @Override
                             public void onResponse(Call call, Response response) throws IOException {
-                                String data = ResponseUtil.getString(response);
-                                Log.d(TAG, "send message: " + data);
-                                MainActivity.actionStart(getActivity());
+                                Info info = ResponseUtil.hadSentMessage(response);
+
+                                if (info.code != 200) {
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(getActivity(), "登录过期，请重新登陆", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                    //处理草稿箱逻辑
+                                    LoginActivity.actionStart(getActivity());
+                                } else {
+                                    MainActivity.actionStart(getActivity());
+                                }
+
+                                getActivity().finish();
                             }
                         });
 
@@ -367,6 +392,7 @@ public class SendMomentFragment extends BaseFragment {
     protected void loadData() {
         mLocationId = Constants.LID;
         mNickname = Constants.NICKNAME;
+        mPicPaths = new ArrayList<>();
     }
 
     @Override
@@ -394,45 +420,15 @@ public class SendMomentFragment extends BaseFragment {
 //        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_MATISSE && resultCode == RESULT_OK) {
 
-            final List<Uri> mPicUris = Matisse.obtainResult(data);
-            List<String> picPaths = null;
+            List<Uri> picUris = Matisse.obtainResult(data);
 
             if (Build.VERSION.SDK_INT >= 19) {
-                picPaths = getImagePathOnKitkat(mPicUris);
+                mPicPaths = getImagePathOnKitkat(picUris);
             } else {
-                picPaths = getImagePathBeforeKitKat(mPicUris);
+                mPicPaths = getImagePathBeforeKitKat(picUris);
             }
 
-
-            for (int i = 0; i < picPaths.size(); i++) {
-
-                if (ivPic0.getVisibility() == View.GONE) {
-                    Bitmap bitmap = displayImage(picPaths.get(i), ivPic0);
-                    if (bitmap != null) {
-                        mPics.add(bitmap);
-                    }
-                    ivPic0.setVisibility(View.VISIBLE);
-                    ibRemovePic0.setVisibility(View.VISIBLE);
-                    mLastSelectablePicNum--;
-                } else if (ivPic1.getVisibility() == View.GONE) {
-                    Bitmap bitmap = displayImage(picPaths.get(i), ivPic1);
-                    if (bitmap != null) {
-                        mPics.add(bitmap);
-                    }
-                    ivPic1.setVisibility(View.VISIBLE);
-                    ibRemovePic1.setVisibility(View.VISIBLE);
-                    mLastSelectablePicNum--;
-                } else if (ivPic2.getVisibility() == View.GONE) {
-                    Bitmap bitmap = displayImage(picPaths.get(i), ivPic2);
-                    if (bitmap != null) {
-                        mPics.add(bitmap);
-                    }
-                    ivPic2.setVisibility(View.VISIBLE);
-                    ibRemovePic2.setVisibility(View.VISIBLE);
-                    mLastSelectablePicNum--;
-                }
-
-            }
+            displayThumb();
 
             new Thread(new Runnable() {
                 @Override
@@ -442,7 +438,7 @@ public class SendMomentFragment extends BaseFragment {
                     for (int i = 0; i < num; i++) {
                         if (i > mPicBase64Code.size() - 1) {
                             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            mPics.get(i).compress(Bitmap.CompressFormat.PNG, 100, baos);
+                            mPics.get(i).compress(Bitmap.CompressFormat.PNG, 50, baos);
                             byte[] bytes = baos.toByteArray();
                             byte[] encode = Base64.encode(bytes, Base64.DEFAULT);
                             mPicBase64Code.add(new String(encode));
@@ -462,6 +458,40 @@ public class SendMomentFragment extends BaseFragment {
                     && ivPic1.getVisibility() == View.VISIBLE
                     && ivPic2.getVisibility() == View.VISIBLE) {
                 ibAddPic.setVisibility(View.GONE);
+            }
+
+        }
+
+    }
+
+    private void displayThumb() {
+
+        for (int i = 0; i < mPicPaths.size(); i++) {
+
+            if (ivPic0.getVisibility() == View.GONE) {
+                Bitmap bitmap = getImageBitmap(mPicPaths.get(i), ivPic0);
+                if (bitmap != null) {
+                    mPics.add(bitmap);
+                }
+                ivPic0.setVisibility(View.VISIBLE);
+                ibRemovePic0.setVisibility(View.VISIBLE);
+                mLastSelectablePicNum--;
+            } else if (ivPic1.getVisibility() == View.GONE) {
+                Bitmap bitmap = getImageBitmap(mPicPaths.get(i), ivPic1);
+                if (bitmap != null) {
+                    mPics.add(bitmap);
+                }
+                ivPic1.setVisibility(View.VISIBLE);
+                ibRemovePic1.setVisibility(View.VISIBLE);
+                mLastSelectablePicNum--;
+            } else if (ivPic2.getVisibility() == View.GONE) {
+                Bitmap bitmap = getImageBitmap(mPicPaths.get(i), ivPic2);
+                if (bitmap != null) {
+                    mPics.add(bitmap);
+                }
+                ivPic2.setVisibility(View.VISIBLE);
+                ibRemovePic2.setVisibility(View.VISIBLE);
+                mLastSelectablePicNum--;
             }
 
         }
@@ -581,7 +611,7 @@ public class SendMomentFragment extends BaseFragment {
         return path;
     }
 
-    private Bitmap displayImage(String imagePath, ImageView imageView) {
+    private Bitmap getImageBitmap(String imagePath, ImageView imageView) {
 
         if (imagePath != null) {
             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);

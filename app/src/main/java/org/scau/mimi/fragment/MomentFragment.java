@@ -92,9 +92,17 @@ public class MomentFragment extends BaseFragment {
                     public void onResponse(Call call, Response response) throws IOException {
                         MessagesInfo messagesInfo = ResponseUtil
                                 .getMessagesInfo(response);
-                        mMessageList.addAll(0,
-                                messagesInfo.content.messageList
-                        );
+                        List<MessagesInfo.Content.Message> messages = messagesInfo.content.messageList;
+                        mMessageList.addAll(0, messages);
+//                        for (int i = 0; i < messages.size(); i++) {
+//                            if (i != messages.size() - 1) {
+//                                if (messages.get(i).mid != messages.get(i + 1).mid) {
+//                                    mMessageList.add(messages.get(i));
+//                                }
+//                            } else {
+//                                mMessageList.add(messages.get(i));
+//                            }
+//                        }
 
                         getActivity().runOnUiThread(new Runnable() {
                             @Override

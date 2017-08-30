@@ -7,7 +7,7 @@ package org.scau.mimi.other;
 public class Constants {
 
     //Test
-    public static final String SECRET = "7bd66b0d2c494edf9326cfbfea7bff00";
+    public static final String SECRET = "ca48733586d54f05afdc032dbea8e22c";
     public static final int LID = 3;
     public static final String NICKNAME = "大壳儿的正版";
 
@@ -28,5 +28,7 @@ public class Constants {
     public static final String SEND_MESSAGE = "/api/message/create";
 
     public static final String UPLOAD_IMAGE = "/api/image/create";
+
+    public static final String LOG_OUT = "/api/user/logout";
 
 }

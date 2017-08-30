@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 
 import com.mingle.sweetpick.CustomDelegate;
@@ -32,6 +33,7 @@ import org.scau.mimi.fragment.ChatFragment;
 import org.scau.mimi.fragment.MomentFragment;
 import org.scau.mimi.gson.MessagesInfo;
 import org.scau.mimi.util.HttpUtil;
+import org.scau.mimi.util.LogUtil;
 import org.scau.mimi.util.ResponseUtil;
 import org.zackratos.ultimatebar.UltimateBar;
 
@@ -46,12 +48,14 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
 
     //Views;
     private ActionBar actionBar;
     private DrawerLayout drawerLayout;
     private FoldingTabBar ftbMenu;
     private ImageView ivAddtionButtonLeft;
+    private TextView tvLogOut;
     private SweetSheet sweetSheet;
     private RelativeLayout rlHomeLayout;
 
@@ -87,10 +91,34 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.dl_main);
         ftbMenu = (FoldingTabBar) findViewById(R.id.ftb_main_menu);
         ivAddtionButtonLeft = (ImageView) findViewById(R.id.fab_addtion_button_left);
+        tvLogOut = (TextView) findViewById(R.id.tv_main_menu_log_out);
+
+        //设置抽屉菜单
+        tvLogOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HttpUtil.logOut(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        String data = ResponseUtil.getString(response);
+                        LogUtil.d(TAG, "log out: " + data);
+                        LoginActivity.actionStart(MainActivity.this);
+                        finish();
+                    }
+                });
+            }
+        });
+
         rlHomeLayout = (RelativeLayout) findViewById(R.id.rl_main_home_layout);
 
-        if (actionBar != null)
+        if (actionBar != null) {
             actionBar.hide();
+        }
 
         drawerLayout.setScrimColor(0x00);
         drawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
@@ -170,28 +198,28 @@ public class MainActivity extends AppCompatActivity {
 
 
         //设置选择地点菜单-------------------------------------------------------------------------------------------
-        sweetSheet = new SweetSheet(rlHomeLayout);
-
-        CustomDelegate customDelegate = new CustomDelegate(true,
-                CustomDelegate.AnimationType.DuangLayoutAnimation);
-        View selectLocationView = LayoutInflater.from(this).inflate(R.layout.layout_select_location, null, false);
-        customDelegate.setCustomView(selectLocationView);
-        sweetSheet.setDelegate(customDelegate);
-
-        selectLocationView.findViewById(R.id.ib_close_select_location)
-                .setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (sweetSheet.isShow())
-                            sweetSheet.dismiss();
-                    }
-                });
-
-
-
-        final RecyclerView rvLocation = (RecyclerView) selectLocationView.findViewById(R.id.rv_select_location);
-        rvLocation.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        rvLocation.setAdapter(new LocationAdapter(mLocations));
+//        sweetSheet = new SweetSheet(rlHomeLayout);
+//
+//        CustomDelegate customDelegate = new CustomDelegate(true,
+//                CustomDelegate.AnimationType.DuangLayoutAnimation);
+//        View selectLocationView = LayoutInflater.from(this).inflate(R.layout.layout_select_location, null, false);
+//        customDelegate.setCustomView(selectLocationView);
+//        sweetSheet.setDelegate(customDelegate);
+//
+//        selectLocationView.findViewById(R.id.ib_close_select_location)
+//                .setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        if (sweetSheet.isShow())
+//                            sweetSheet.dismiss();
+//                    }
+//                });
+//
+//
+//
+//        final RecyclerView rvLocation = (RecyclerView) selectLocationView.findViewById(R.id.rv_select_location);
+//        rvLocation.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+//        rvLocation.setAdapter(new LocationAdapter(mLocations));
 
 
         //-----------------------------------------------------------------------------------------------------------
@@ -199,38 +227,36 @@ public class MainActivity extends AppCompatActivity {
         ivAddtionButtonLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HttpUtil.requestLocations(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
 
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        mLocations.clear();
-                        mLocations.addAll(
-                                ResponseUtil.getLocations(response)
-                        );
-                        rvLocation.getAdapter().notifyDataSetChanged();
-
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (!sweetSheet.isShow())
-                                    sweetSheet.show();
-                            }
-                        });
-                    }
-                });
+                SendMomentActivity.actionStart(MainActivity.this);
+//                HttpUtil.requestLocations(new Callback() {
+//                    @Override
+//                    public void onFailure(Call call, IOException e) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onResponse(Call call, Response response) throws IOException {
+//                        mLocations.clear();
+//                        mLocations.addAll(
+//                                ResponseUtil.getLocations(response)
+//                        );
+//                        rvLocation.getAdapter().notifyDataSetChanged();
+//
+//
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                if (!sweetSheet.isShow())
+//                                    sweetSheet.show();
+//                            }
+//                        });
+//                    }
+//                });
             }
         });
 
         addDefaultFragment();
-
-//        new QBadgeView(this).bindTarget(ftbMenu)
-//                .setBadgeNumber(3).setBadgeGravity(Gravity.START | Gravity.TOP);
-
 
     }
 

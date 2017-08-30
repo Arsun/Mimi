@@ -15,8 +15,12 @@ import android.widget.Toast;
 
 import com.dd.CircularProgressButton;
 
+import org.litepal.LitePal;
+import org.litepal.crud.DataSupport;
 import org.scau.mimi.R;
+import org.scau.mimi.activity.MainActivity;
 import org.scau.mimi.base.BaseFragment;
+import org.scau.mimi.database.User;
 import org.scau.mimi.util.HttpUtil;
 import org.scau.mimi.util.ResponseUtil;
 import org.scau.mimi.util.TextUtil;
@@ -126,6 +130,10 @@ public class LoginFragment extends BaseFragment {
         if (TextUtil.isTextVaild(mAccount) && TextUtil.isTextVaild(mPassword)) {
 
             cpbLogin.setProgress(START_LOGIN);
+            //TODO：处理登陆后输入框禁止输入的交互，如果登录失败记得重新允许输入
+            etAccount.setEnabled(false);
+            etPassword.setEnabled(false);
+
             HttpUtil.login(mAccount, mPassword, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
@@ -134,12 +142,19 @@ public class LoginFragment extends BaseFragment {
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                    String data = ResponseUtil.getString(response);
-                    Log.d(TAG, data);
+                     User user;
+                    if (DataSupport.count(User.class) == 0) {
+                        user = new User();
+                    } else {
+                        user = DataSupport.findFirst(User.class);
+                    }
+                    user.setSecret(ResponseUtil.getLoginInfo(response).content.secret);
+                    user.save();
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             cpbLogin.setProgress(FINISH_LOGIN);
+                            MainActivity.actionStart(getActivity());
                         }
                     });
                 }

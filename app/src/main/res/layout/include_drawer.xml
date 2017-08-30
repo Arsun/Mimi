@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="300dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="left"
+    android:tag="LEFT"
+    android:background="#00000000"
+    android:fitsSystemWindows="true"
+    >
+
+    //header
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        >
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/zs"
+            android:scaleType="centerCrop"
+            android:layout_centerInParent="true"
+            />
+
+    </RelativeLayout>
+
+    //menu
+   <android.support.percent.PercentRelativeLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="vertical"
+       android:layout_weight="1"
+       >
+
+       <TextView
+           android:id="@+id/tv_main_menu_0"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:drawableLeft="@drawable/ic_moment_edit"
+           android:text="个人信息"
+           android:gravity="center"
+           android:clickable="true"
+           android:paddingLeft="10dp"
+           android:background="?android:attr/selectableItemBackground"
+           android:paddingTop="5dp"
+           android:paddingBottom="5dp"
+           />
+
+       <TextView
+           android:id="@+id/tv_main_menu_1"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:drawableLeft="@drawable/ic_moment_edit"
+           android:text="草稿箱"
+           android:gravity="center"
+           android:clickable="true"
+           android:background="?android:attr/selectableItemBackground"
+           android:layout_below="@+id/tv_main_menu_0"
+           android:paddingLeft="10dp"
+           android:paddingTop="5dp"
+           android:paddingBottom="5dp"
+           />
+
+       <TextView
+           android:id="@+id/tv_main_menu_2"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:drawableLeft="@drawable/ic_moment_edit"
+           android:text="设置"
+           android:gravity="center"
+           android:clickable="true"
+           android:background="?android:attr/selectableItemBackground"
+           android:layout_below="@id/tv_main_menu_1"
+           android:paddingLeft="10dp"
+           android:paddingTop="5dp"
+           android:paddingBottom="5dp"
+           />
+
+       <TextView
+           android:id="@+id/tv_main_menu_log_out"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:drawableLeft="@drawable/ic_log_out"
+           android:gravity="center_vertical"
+           android:clickable="true"
+           android:background="?android:attr/selectableItemBackground"
+           android:layout_alignParentBottom="true"
+           android:layout_marginBottom="30dp"
+           android:paddingLeft="10dp"
+           android:paddingTop="5dp"
+           android:paddingBottom="5dp"
+           android:text="退出登录"
+           />
+
+   </android.support.percent.PercentRelativeLayout>
+
+
+</LinearLayout>

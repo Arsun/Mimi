@@ -7,7 +7,9 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
+import org.litepal.crud.DataSupport;
 import org.scau.mimi.R;
+import org.scau.mimi.database.User;
 import org.scau.mimi.other.Constants;
 //import org.scau.mimi.other.GlideApp;
 
@@ -34,21 +36,26 @@ public class HttpUtil {
 
     private static final String TAG = "HttpUtil";
 
-    private static final OkHttpClient sOkHttpClient = new OkHttpClient();
+    private static final String KEY_USERNAME = "uname";
+    private static final String KEY_NICKNAME = "nname";
+    private static final String KEY_PASSWORD = "passwd";
+    private static final String KEY_CONFIRM_PASSWORD = "rpasswd";
+    private static final String KEY_CONTENT = "content";
+    private static final String KEY_LOCATION = "lid";
+    private static final String KEY_IS_FAKE = "isFake";
+    private static final String KEY_IMAGE_ID = "imageidList";
+    private static final String KEY_HEADER = "janke-authorization";
+    private static final String KEY_IMAGE = "image";
 
-    public static void sendHttpRequest(String address, Callback callback) {
-        Request request = new Request.Builder()
-                .url(address)
-                .build();
-        sOkHttpClient.newCall(request).enqueue(callback);
-    }
+
+    private static final OkHttpClient sOkHttpClient = new OkHttpClient();
 
     public static void signUp(String account, String username, String password, String confirmPassword, Callback callback) {
         RequestBody body = new FormBody.Builder()
-                .add("uname", account)
-                .add("nname", username)
-                .add("passwd", password)
-                .add("rpasswd", confirmPassword)
+                .add(KEY_USERNAME, account)
+                .add(KEY_NICKNAME, username)
+                .add(KEY_PASSWORD, password)
+                .add(KEY_CONFIRM_PASSWORD, confirmPassword)
                 .build();
         Request request = new Request.Builder()
                 .url(Constants.ADDRESS + Constants.SIGN_UP)
@@ -59,8 +66,8 @@ public class HttpUtil {
 
     public static void login(String account, String password, Callback callback) {
         RequestBody body = new FormBody.Builder()
-                .add("uname", account)
-                .add("passwd", password)
+                .add(KEY_USERNAME, account)
+                .add(KEY_PASSWORD, password)
                 .build();
         Request request = new Request.Builder()
                 .url(Constants.ADDRESS + Constants.LOGIN)
@@ -80,7 +87,7 @@ public class HttpUtil {
         Glide.with(context)
                 .load(Constants.ADDRESS + url)
                 .asBitmap()
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(imageView);
 
     }
@@ -94,24 +101,26 @@ public class HttpUtil {
 
     public static void sendMessage(String content, Integer lid, boolean isFake, @Nullable List<Integer> imageIdList, Callback callback) {
         FormBody.Builder builder = new FormBody.Builder()
-                .add("content", content)
-                .add("lid", lid.toString());
+                .add(KEY_CONTENT, content)
+                .add(KEY_LOCATION, lid.toString());
 
         if (isFake) {
-            builder.add("isFake", String.valueOf(isFake));
+            builder.add(KEY_IS_FAKE, String.valueOf(isFake));
         }
 
         if (imageIdList != null) {
             for (int i = 0; i < imageIdList.size(); i++) {
-                builder.add("imageidList", imageIdList.get(i).toString());
+                builder.add(KEY_IMAGE_ID, imageIdList.get(i).toString());
                 LogUtil.d(TAG, "id: " + imageIdList.get(i));
             }
         }
 
+        User user = DataSupport.findFirst(User.class);
+
         RequestBody body = builder.build();
         Request request = new Request.Builder()
                 .url(Constants.ADDRESS + Constants.SEND_MESSAGE)
-                .addHeader("janke-authorization", Constants.SECRET)
+                .addHeader(KEY_HEADER, user.getSecret())
                 .post(body)
                 .build();
         sOkHttpClient.newCall(request).enqueue(callback);
@@ -158,12 +167,27 @@ public class HttpUtil {
 //            }
 //        }).start();
         RequestBody body = new FormBody.Builder()
-                .add("image", base64Code)
+                .add(KEY_IMAGE, base64Code)
                 .build();
+
+        User user = DataSupport.findFirst(User.class);
+
         Request request = new Request.Builder()
                 .url(Constants.ADDRESS + Constants.UPLOAD_IMAGE)
-                .addHeader("janke-authorization", Constants.SECRET)
+                .addHeader(KEY_HEADER, user.getSecret())
                 .post(body)
+                .build();
+        sOkHttpClient.newCall(request).enqueue(callback);
+
+    }
+
+    public static void logOut(Callback callback) {
+
+        User user = DataSupport.findFirst(User.class);
+
+        Request request = new Request.Builder()
+                .url(Constants.ADDRESS + Constants.LOG_OUT)
+                .addHeader(KEY_HEADER, user.getSecret())
                 .build();
         sOkHttpClient.newCall(request).enqueue(callback);
 

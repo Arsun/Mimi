@@ -114,6 +114,7 @@
                     android:background="@android:color/darker_gray"
                     android:scaleType="centerCrop"
                     android:clickable="true"
+                    android:visibility="visible"
                     />
 
                 <ImageView
@@ -128,6 +129,7 @@
                     android:scaleType="centerCrop"
                     android:clickable="true"
                     android:layout_toRightOf="@id/iv_moment_pic_0"
+                    android:visibility="visible"
                     />
 
                 <ImageView
@@ -142,6 +144,7 @@
                     android:scaleType="centerCrop"
                     android:clickable="true"
                     android:layout_toRightOf="@id/iv_moment_pic_1"
+                    android:visibility="visible"
                     />
 
             </android.support.percent.PercentRelativeLayout>

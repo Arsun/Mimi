@@ -18,9 +18,9 @@ public class LoginInfo {
 
         public User user;
 
-        public int tmCreated;
+        public long tmCreated;
 
-        public int tmExpire;
+        public long tmExpire;
 
         public class User {
             public int uid;
@@ -29,7 +29,7 @@ public class LoginInfo {
 
             public String nname;
 
-            public int tmCreated;
+            public long tmCreated;
 
         }
 
