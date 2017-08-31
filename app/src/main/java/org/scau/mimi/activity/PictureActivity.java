@@ -8,12 +8,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.util.Pair;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.transition.Transition;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -65,7 +61,6 @@ public class PictureActivity extends AppCompatActivity {
 
     private void initVariables() {
         mPicUrls = getIntent().getStringArrayExtra(EXTRA_URL);
-        mSize = getIntent().getIntArrayExtra(EXTRA_THUMBNAIL_SIZE);
         mPosition = getIntent().getIntExtra(EXTRA_POSITION, 0);
     }
 
@@ -74,15 +69,7 @@ public class PictureActivity extends AppCompatActivity {
         ivThumbnail = (ImageView) findViewById(R.id.iv_picture_thumbnail);
 
         vpPicturePager.setAdapter(new PictureFragmentPagerAdapter(getSupportFragmentManager(), mPicUrls));
-
-        if (addTransitionListener()) {
-            displayThumbnail();
-            ViewCompat.setTransitionName(ivThumbnail, SHARED_ELEMENT_PHOTO);
-        } else {
-            vpPicturePager.setCurrentItem(mPosition);
-            ivThumbnail.setVisibility(View.GONE);
-            vpPicturePager.setVisibility(View.VISIBLE);
-        }
+        vpPicturePager.setCurrentItem(mPosition);
 
     }
 
@@ -99,60 +86,18 @@ public class PictureActivity extends AppCompatActivity {
 
     }
 
-    public static void actionStart(Activity activity, ImageView imageView, String[] urls, int[] size, int position) {
-        ActivityOptionsCompat options = ActivityOptionsCompat
-                .makeSceneTransitionAnimation(activity, new Pair<View, String>(imageView, SHARED_ELEMENT_PHOTO));
+    public static void actionStart(Activity activity, ImageView imageView, String[] urls, int position) {
+        ActivityOptionsCompat compat = ActivityOptionsCompat
+                .makeSceneTransitionAnimation(activity
+                        , imageView
+                        , activity.getString(R.string.image_transition));
 
         Intent intent = new Intent(activity, PictureActivity.class);
         intent.putExtra(EXTRA_URL, urls);
-        intent.putExtra(EXTRA_THUMBNAIL_SIZE, size);
         intent.putExtra(EXTRA_POSITION, position);
 
-        ActivityCompat.startActivity(activity, intent, options.toBundle());
+        ActivityCompat.startActivity(activity, intent, compat.toBundle());
 
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private boolean addTransitionListener() {
-        Transition transition = getWindow().getSharedElementEnterTransition();
-        if (transition != null) {
-            transition.addListener(new Transition.TransitionListener() {
-                @Override
-                public void onTransitionStart(Transition transition) {
-
-                }
-
-                @Override
-                public void onTransitionEnd(Transition transition) {
-                    transition.removeListener(this);
-                    vpPicturePager.setCurrentItem(mPosition);
-                    ivThumbnail.setVisibility(View.GONE);
-                    vpPicturePager.setVisibility(View.VISIBLE);
-                }
-
-                @Override
-                public void onTransitionCancel(Transition transition) {
-                    transition.removeListener(this);
-                    vpPicturePager.setCurrentItem(mPosition);
-                    ivThumbnail.setVisibility(View.GONE);
-                    vpPicturePager.setVisibility(View.VISIBLE);
-                }
-
-                @Override
-                public void onTransitionPause(Transition transition) {
-
-                }
-
-                @Override
-                public void onTransitionResume(Transition transition) {
-
-                }
-            });
-
-            return true;
-        }
-
-        return false;
     }
 
 }

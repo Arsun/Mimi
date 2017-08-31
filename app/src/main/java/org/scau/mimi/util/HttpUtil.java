@@ -85,10 +85,11 @@ public class HttpUtil {
 
     public static void loadImageByGlide(Context context, String url, ImageView imageView) {
         Glide.with(context)
-                .load(Constants.ADDRESS + url)
+                .load(url)
                 .asBitmap()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(imageView);
+
 
     }
 

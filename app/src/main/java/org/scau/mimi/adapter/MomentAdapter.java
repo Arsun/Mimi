@@ -2,9 +2,6 @@ package org.scau.mimi.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +9,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.hitomi.glideloader.GlideImageLoader;
+import com.hitomi.tilibrary.style.index.NumberIndexIndicator;
+import com.hitomi.tilibrary.style.progress.ProgressBarIndicator;
+import com.hitomi.tilibrary.transfer.TransferConfig;
 import com.sackcentury.shinebuttonlib.ShineButton;
 
 import org.scau.mimi.R;
+import org.scau.mimi.activity.MainActivity;
 import org.scau.mimi.activity.PictureActivity;
 import org.scau.mimi.gson.MessagesInfo;
 import org.scau.mimi.other.Constants;
@@ -41,26 +43,25 @@ public class MomentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private Context mContext;
 
      static class NormalViewHolder extends RecyclerView.ViewHolder {
+         Context mContext;
 
-        String[] mPicUrls;
-        Context mContext;
+         CircleImageView civPortrait;
+         TextView tvNickname;
+         TextView tvPostTime;
+         TextView tvLocation;
+         TextView tvTextContent;
+         ShineButton sbLikeButton;
+         AdvTextSwitcher atsLikeNumber;
+         AdvTextSwitcher atsCommentNumber;
+         ImageView ivMomentPic0;
+         ImageView ivMomentPic1;
+         ImageView ivMomentPic2;
+
+         public NormalViewHolder(View itemView) {
+             super(itemView);
+             mContext = itemView.getContext();
 
 
-        CircleImageView civPortrait;
-        TextView tvNickname;
-        TextView tvPostTime;
-        TextView tvLocation;
-        TextView tvTextContent;
-        ShineButton sbLikeButton;
-        AdvTextSwitcher atsLikeNumber;
-        AdvTextSwitcher atsCommentNumber;
-        ImageView ivMomentPic0;
-        ImageView ivMomentPic1;
-        ImageView ivMomentPic2;
-
-        public NormalViewHolder(View itemView) {
-            super(itemView);
-            mContext = itemView.getContext();
 
             tvNickname = (TextView) itemView.findViewById(R.id.tv_nickname);
             tvPostTime = (TextView) itemView.findViewById(R.id.tv_post_time);
@@ -75,10 +76,10 @@ public class MomentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
         public void bind(final MessagesInfo.Content.Message message) {
-
-            mPicUrls = new String[message.messageImageSet.size()];
+            final List<String> picUrls;
+            picUrls = new ArrayList<>();
             for (int i = 0; i < message.messageImageSet.size(); i++) {
-                mPicUrls[i] = Constants.ADDRESS + message.messageImageSet.get(i).webPath;
+                picUrls.add(Constants.ADDRESS + message.messageImageSet.get(i).webPath);
             }
 
 
@@ -115,81 +116,86 @@ public class MomentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             atsLikeNumber.setText(String.valueOf(message.likeCount));
             atsCommentNumber.setText(String.valueOf(message.commentCount));
 
-            List<MessagesInfo.Content.Message.MessageImageSet> imageSetList = message.messageImageSet;
-            if (imageSetList != null) {
+            int picNum = message.messageImageSet.size();
+            LogUtil.d(TAG, "picNum: " + picNum);
+            if (picNum == 3) {
+                HttpUtil.loadImageByGlide(mContext, picUrls.get(0), ivMomentPic0);
+                HttpUtil.loadImageByGlide(mContext, picUrls.get(1), ivMomentPic1);
+                HttpUtil.loadImageByGlide(mContext, picUrls.get(2), ivMomentPic2);
+                ivMomentPic0.setVisibility(View.VISIBLE);
+                ivMomentPic1.setVisibility(View.VISIBLE);
+                ivMomentPic2.setVisibility(View.VISIBLE);
 
-                int picNum = imageSetList.size();
-                LogUtil.d(TAG, "picNum: " + picNum);
-                if (picNum == 3) {
-                    HttpUtil.loadImageByGlide(mContext, imageSetList.get(0).webPath, ivMomentPic0);
-                    HttpUtil.loadImageByGlide(mContext, imageSetList.get(1).webPath, ivMomentPic1);
-                    HttpUtil.loadImageByGlide(mContext, imageSetList.get(2).webPath, ivMomentPic2);
-                    ivMomentPic0.setVisibility(View.VISIBLE);
-                    ivMomentPic1.setVisibility(View.VISIBLE);
-                    ivMomentPic2.setVisibility(View.VISIBLE);
-                } else if (picNum == 2) {
-                    HttpUtil.loadImageByGlide(mContext, imageSetList.get(0).webPath, ivMomentPic0);
-                    HttpUtil.loadImageByGlide(mContext, imageSetList.get(1).webPath, ivMomentPic1);
-                    ivMomentPic0.setVisibility(View.VISIBLE);
-                    ivMomentPic1.setVisibility(View.VISIBLE);
-                    ivMomentPic2.setVisibility(View.GONE);
-                    if (ivMomentPic1.getVisibility() == View.VISIBLE) {
-                        LogUtil.d(TAG, "true");
-                    } else {
-                        LogUtil.d(TAG, "false");
-                    }
-                } else if (picNum == 1) {
-                    HttpUtil.loadImageByGlide(mContext, imageSetList.get(0).webPath, ivMomentPic0);
-                    ivMomentPic0.setVisibility(View.VISIBLE);
-                    ivMomentPic1.setVisibility(View.GONE);
-                    ivMomentPic2.setVisibility(View.GONE);
-                } else if (picNum == 0) {
-                    ivMomentPic0.setVisibility(View.GONE);
-                    ivMomentPic1.setVisibility(View.GONE);
-                    ivMomentPic2.setVisibility(View.GONE);
-                }
+            } else if (picNum == 2) {
+                HttpUtil.loadImageByGlide(mContext, picUrls.get(0), ivMomentPic0);
+                HttpUtil.loadImageByGlide(mContext, picUrls.get(1), ivMomentPic1);
+                ivMomentPic0.setVisibility(View.VISIBLE);
+                ivMomentPic1.setVisibility(View.VISIBLE);
+                ivMomentPic2.setVisibility(View.GONE);
 
+            } else if (picNum == 1) {
+                HttpUtil.loadImageByGlide(mContext, picUrls.get(0), ivMomentPic0);
+                ivMomentPic0.setVisibility(View.VISIBLE);
+                ivMomentPic1.setVisibility(View.GONE);
+                ivMomentPic2.setVisibility(View.GONE);
+
+
+            } else if (picNum == 0) {
+                ivMomentPic0.setVisibility(View.GONE);
+                ivMomentPic1.setVisibility(View.GONE);
+                ivMomentPic2.setVisibility(View.GONE);
             }
 
-//            ivMomentPic0.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//
-//                    PictureActivity.actionStart(
-//                            (Activity)(mContext)
-//                            , ivMomentPic0
-//                            , mPicUrls
-//                            , new int[]{ ivMomentPic0.getWidth(), ivMomentPic0.getHeight()}
-//                            , 0
-//                    );
-//                }
-//            });
-//
-//            ivMomentPic1.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    PictureActivity.actionStart(
-//                            (Activity)(mContext)
-//                            , ivMomentPic1
-//                            , mPicUrls
-//                            , new int[]{ ivMomentPic1.getWidth(), ivMomentPic1.getHeight()}
-//                            , 1
-//                    );
-//                }
-//            });
-//
-//            ivMomentPic2.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    PictureActivity.actionStart(
-//                            (Activity)(mContext)
-//                            , ivMomentPic2
-//                            , mPicUrls
-//                            , new int[]{ ivMomentPic2.getWidth(), ivMomentPic2.getHeight()}
-//                            , 2
-//                    );
-//                }
-//            });
+
+            //使用transferee
+            final List<ImageView> imageViewList = new ArrayList<>();
+            imageViewList.add(ivMomentPic0);
+            imageViewList.add(ivMomentPic1);
+            imageViewList.add(ivMomentPic2);
+            ivMomentPic0.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    TransferConfig config = TransferConfig.build()
+                            .setOriginImageList(imageViewList)
+                            .setSourceImageList(picUrls)
+                            .setNowThumbnailIndex(0)
+                            .setIndexIndicator(new NumberIndexIndicator())
+                            .setProgressIndicator(new ProgressBarIndicator())
+                            .setImageLoader(GlideImageLoader.with(mContext))
+                            .create();
+                    ((MainActivity)mContext).getTransferee().apply(config).show();
+                }
+            });
+
+            ivMomentPic1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    TransferConfig config = TransferConfig.build()
+                            .setOriginImageList(imageViewList)
+                            .setSourceImageList(picUrls)
+                            .setNowThumbnailIndex(1)
+                            .setIndexIndicator(new NumberIndexIndicator())
+                            .setProgressIndicator(new ProgressBarIndicator())
+                            .setImageLoader(GlideImageLoader.with(mContext))
+                            .create();
+                    ((MainActivity)mContext).getTransferee().apply(config).show();
+                }
+            });
+
+            ivMomentPic2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    TransferConfig config = TransferConfig.build()
+                            .setOriginImageList(imageViewList)
+                            .setSourceImageList(picUrls)
+                            .setNowThumbnailIndex(2)
+                            .setIndexIndicator(new NumberIndexIndicator())
+                            .setProgressIndicator(new ProgressBarIndicator())
+                            .setImageLoader(GlideImageLoader.with(mContext))
+                            .create();
+                    ((MainActivity)mContext).getTransferee().apply(config).show();
+                }
+            });
 
         }
 

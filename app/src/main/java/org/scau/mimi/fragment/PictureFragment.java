@@ -67,14 +67,7 @@ public class PictureFragment extends BaseFragment {
                 .load(mPicUrl)
                 .asBitmap()
                 .dontAnimate()
-                .into(
-                        new SimpleTarget<Bitmap>() {
-                            @Override
-                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                                ivPic.setImageBitmap(resource);
-                            }
-                        }
-                );
+                .into(ivPic);
 
         ivPic.setOnClickListener(new View.OnClickListener() {
             @Override

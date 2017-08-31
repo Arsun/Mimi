@@ -8,7 +8,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#62cfca">
+    android:background="#62cfca"
+    tools:context=".activity.MainActivity"
+    >
 
     <RelativeLayout
         android:id="@+id/rl_main_home_layout"

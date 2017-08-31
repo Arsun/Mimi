@@ -22,13 +22,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
-import com.mingle.sweetpick.CustomDelegate;
-import com.mingle.sweetpick.SweetSheet;
+import com.hitomi.tilibrary.transfer.Transferee;
 import com.nineoldandroids.view.ViewHelper;
 
 import org.jetbrains.annotations.NotNull;
 import org.scau.mimi.R;
-import org.scau.mimi.adapter.LocationAdapter;
+
 import org.scau.mimi.fragment.ChatFragment;
 import org.scau.mimi.fragment.MomentFragment;
 import org.scau.mimi.gson.MessagesInfo;
@@ -56,12 +55,14 @@ public class MainActivity extends AppCompatActivity {
     private FoldingTabBar ftbMenu;
     private ImageView ivAddtionButtonLeft;
     private TextView tvLogOut;
-    private SweetSheet sweetSheet;
     private RelativeLayout rlHomeLayout;
 
     //Variables
     private int mOriginFtbMenuTop;
     private List<MessagesInfo.Content.Message.Location> mLocations;
+    //Test
+    private Transferee mTransferee;
+
 
 
     @Override
@@ -84,6 +85,25 @@ public class MainActivity extends AppCompatActivity {
 
 //        StatusBarUtil.setColor(this, 0x454e5f, 122);
 //        StatusBarUtil.setTransparent(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mTransferee = Transferee.getDefault(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mTransferee.destroy();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+
     }
 
     private void initViews() {
@@ -197,62 +217,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        //设置选择地点菜单-------------------------------------------------------------------------------------------
-//        sweetSheet = new SweetSheet(rlHomeLayout);
-//
-//        CustomDelegate customDelegate = new CustomDelegate(true,
-//                CustomDelegate.AnimationType.DuangLayoutAnimation);
-//        View selectLocationView = LayoutInflater.from(this).inflate(R.layout.layout_select_location, null, false);
-//        customDelegate.setCustomView(selectLocationView);
-//        sweetSheet.setDelegate(customDelegate);
-//
-//        selectLocationView.findViewById(R.id.ib_close_select_location)
-//                .setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        if (sweetSheet.isShow())
-//                            sweetSheet.dismiss();
-//                    }
-//                });
-//
-//
-//
-//        final RecyclerView rvLocation = (RecyclerView) selectLocationView.findViewById(R.id.rv_select_location);
-//        rvLocation.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-//        rvLocation.setAdapter(new LocationAdapter(mLocations));
-
-
-        //-----------------------------------------------------------------------------------------------------------
 
         ivAddtionButtonLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 SendMomentActivity.actionStart(MainActivity.this);
-//                HttpUtil.requestLocations(new Callback() {
-//                    @Override
-//                    public void onFailure(Call call, IOException e) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onResponse(Call call, Response response) throws IOException {
-//                        mLocations.clear();
-//                        mLocations.addAll(
-//                                ResponseUtil.getLocations(response)
-//                        );
-//                        rvLocation.getAdapter().notifyDataSetChanged();
-//
-//
-//                        runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                if (!sweetSheet.isShow())
-//                                    sweetSheet.show();
-//                            }
-//                        });
-//                    }
-//                });
             }
         });
 
@@ -265,10 +234,15 @@ public class MainActivity extends AppCompatActivity {
 
         mLocations = new ArrayList<>();
 
+
     }
 
     private void loadData() {
 
+    }
+
+    public Transferee getTransferee() {
+        return mTransferee;
     }
 
     private void addDefaultFragment() {
@@ -327,8 +301,10 @@ public class MainActivity extends AppCompatActivity {
         context.startActivity(intent);
     }
 
+
 //    private List<MessagesInfo.Content.Message.Location> initLocationList() {
 //        for (i = 0; i < 5; i++) {
 //        }
 //    }
+
 }

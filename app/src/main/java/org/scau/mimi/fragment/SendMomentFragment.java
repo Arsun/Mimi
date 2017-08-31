@@ -32,6 +32,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hitomi.glideloader.GlideImageLoader;
+import com.hitomi.tilibrary.style.index.NumberIndexIndicator;
+import com.hitomi.tilibrary.style.progress.ProgressBarIndicator;
+import com.hitomi.tilibrary.transfer.TransferConfig;
+import com.hitomi.tilibrary.transfer.Transferee;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
@@ -39,6 +44,7 @@ import com.zhihu.matisse.engine.impl.GlideEngine;
 import org.scau.mimi.R;
 import org.scau.mimi.activity.LoginActivity;
 import org.scau.mimi.activity.MainActivity;
+import org.scau.mimi.activity.SendMomentActivity;
 import org.scau.mimi.base.BaseFragment;
 import org.scau.mimi.gson.ImagesInfo;
 import org.scau.mimi.gson.Info;
@@ -75,12 +81,11 @@ public class SendMomentFragment extends BaseFragment {
 
     //Varibles
     private String mTextContent;
-    private List<ImageView> mImageViews;
-    private List<ImageButton> mImageButtons;
     private List<String> mPicBase64Code;
     private int mLastSelectablePicNum;
     private List<Bitmap> mPics;
     private int mLocationId;
+    private List<ImageView> mImageViews;
 
 
     //Data
@@ -124,11 +129,10 @@ public class SendMomentFragment extends BaseFragment {
         mTextContent = "";
         mLastSelectablePicNum = 3;
 
-//        mPicUris = new ArrayList<>();
-//        picPaths = new ArrayList<>();
         mPics = new ArrayList<>();
         mImageViews = new ArrayList<>();
-        mImageButtons = new ArrayList<>();
+        mPicPaths = new ArrayList<>();
+
         mPicBase64Code = new ArrayList<>();
 
     }
@@ -154,8 +158,9 @@ public class SendMomentFragment extends BaseFragment {
         ibClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.actionStart(getActivity());
                 getActivity().finish();
+                MainActivity.actionStart(getActivity());
+
             }
         });
 
@@ -192,13 +197,54 @@ public class SendMomentFragment extends BaseFragment {
             }
         });
 
+
         mImageViews.add(ivPic0);
         mImageViews.add(ivPic1);
         mImageViews.add(ivPic2);
+        ivPic0.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TransferConfig config = TransferConfig.build()
+                        .setOriginImageList(mImageViews)
+                        .setSourceImageList(mPicPaths)
+                        .setImageLoader(GlideImageLoader.with(getActivity()))
+                        .setIndexIndicator(new NumberIndexIndicator())
+                        .setProgressIndicator(new ProgressBarIndicator())
+                        .setNowThumbnailIndex(0)
+                        .create();
+                ((SendMomentActivity)getActivity()).getTransferee().apply(config).show();
+            }
+        });
 
-        mImageButtons.add(ibRemovePic0);
-        mImageButtons.add(ibRemovePic1);
-        mImageButtons.add(ibRemovePic2);
+        ivPic1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TransferConfig config = TransferConfig.build()
+                        .setOriginImageList(mImageViews)
+                        .setSourceImageList(mPicPaths)
+                        .setImageLoader(GlideImageLoader.with(getActivity()))
+                        .setIndexIndicator(new NumberIndexIndicator())
+                        .setProgressIndicator(new ProgressBarIndicator())
+                        .setNowThumbnailIndex(1)
+                        .create();
+                ((SendMomentActivity)getActivity()).getTransferee().apply(config).show();
+            }
+        });
+
+        ivPic2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TransferConfig config = TransferConfig.build()
+                        .setOriginImageList(mImageViews)
+                        .setSourceImageList(mPicPaths)
+                        .setImageLoader(GlideImageLoader.with(getActivity()))
+                        .setIndexIndicator(new NumberIndexIndicator())
+                        .setProgressIndicator(new ProgressBarIndicator())
+                        .setNowThumbnailIndex(2)
+                        .create();
+                ((SendMomentActivity)getActivity()).getTransferee().apply(config).show();
+            }
+        });
 
         ibRemovePic0.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -257,6 +303,10 @@ public class SendMomentFragment extends BaseFragment {
         }
         mPicBase64Code.remove(0);
         mLastSelectablePicNum++;
+        mPicPaths.remove(0);
+
+        LogUtil.d(TAG, "picPaths: " + mPicPaths.size());
+
         ibAddPic.setVisibility(View.VISIBLE);
         if (!canSend()) {
             btnSend.setEnabled(false);
@@ -281,6 +331,7 @@ public class SendMomentFragment extends BaseFragment {
         }
         mPicBase64Code.remove(1);
         mLastSelectablePicNum++;
+        mPicPaths.remove(1);
         ibAddPic.setVisibility(View.VISIBLE);
         if (!canSend()) {
             btnSend.setEnabled(false);
@@ -296,6 +347,7 @@ public class SendMomentFragment extends BaseFragment {
         }
         mPicBase64Code.remove(2);
         mLastSelectablePicNum++;
+        mPicPaths.remove(2);
         ibAddPic.setVisibility(View.VISIBLE);
         if (!canSend()) {
             btnSend.setEnabled(false);
@@ -423,9 +475,9 @@ public class SendMomentFragment extends BaseFragment {
             List<Uri> picUris = Matisse.obtainResult(data);
 
             if (Build.VERSION.SDK_INT >= 19) {
-                mPicPaths = getImagePathOnKitkat(picUris);
+                mPicPaths.addAll(getImagePathOnKitkat(picUris));
             } else {
-                mPicPaths = getImagePathBeforeKitKat(picUris);
+                mPicPaths.addAll(getImagePathBeforeKitKat(picUris));
             }
 
             displayThumb();
@@ -539,7 +591,7 @@ public class SendMomentFragment extends BaseFragment {
 
     private void startMatisse() {
         Matisse.from(this)
-                .choose(MimeType.allOf())
+                .choose(MimeType.of(MimeType.JPEG, MimeType.PNG))
                 .countable(true)
                 .maxSelectable(mLastSelectablePicNum)
                 .gridExpectedSize(getResources().getDimensionPixelSize(R.dimen.matisse_pic_grid))

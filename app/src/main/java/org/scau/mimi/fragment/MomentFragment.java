@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hitomi.tilibrary.transfer.Transferee;
 import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 
@@ -18,6 +19,7 @@ import org.scau.mimi.adapter.MomentAdapter;
 import org.scau.mimi.base.BaseFragment;
 import org.scau.mimi.gson.MessagesInfo;
 import org.scau.mimi.util.HttpUtil;
+import org.scau.mimi.util.LogUtil;
 import org.scau.mimi.util.ResponseUtil;
 
 import java.io.IOException;
@@ -48,6 +50,13 @@ public class MomentFragment extends BaseFragment {
     private View mRootView;
     private int nextPage;
 
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -68,8 +77,8 @@ public class MomentFragment extends BaseFragment {
     @Override
     protected void initVariables() {
         mMessageList = new ArrayList<>();
-//        mActivity = (MainActivity)getActivity();
-//        mGestureDetectorCompat = new GestureDetectorCompat(mActivity, new MyGestureListener());
+        nextPage = 1;
+
     }
 
     @Override
@@ -82,10 +91,16 @@ public class MomentFragment extends BaseFragment {
         trlRefreshMoment.setOnRefreshListener(new RefreshListenerAdapter() {
             @Override
             public void onRefresh(TwinklingRefreshLayout refreshLayout) {
-                HttpUtil.requestMessages(nextPage, new Callback() {
+                HttpUtil.requestMessages(0, new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
-
+                        LogUtil.d(TAG, "failed to request messages.");
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                trlRefreshMoment.finishRefreshing();
+                            }
+                        });
                     }
 
                     @Override
@@ -118,9 +133,36 @@ public class MomentFragment extends BaseFragment {
 
             @Override
             public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
-                super.onLoadMore(refreshLayout);
+                HttpUtil.requestMessages(nextPage, new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        LogUtil.d(TAG, "failed to load more.");
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                trlRefreshMoment.finishLoadmore();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        MessagesInfo messagesInfo = ResponseUtil.getMessagesInfo(response);
+                        nextPage++;
+                        mMessageList.addAll(messagesInfo.content.messageList);
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                rvMoment.getAdapter().notifyDataSetChanged();
+                                trlRefreshMoment.finishLoadmore();
+                            }
+                        });
+                    }
+                });
             }
         });
+
 
 //        rvMoment.setOnTouchListener(new View.OnTouchListener() {
 //            @Override
