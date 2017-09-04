@@ -14,4 +14,5 @@ public abstract class BaseFragment extends Fragment {
     protected abstract void initViews(View view);
 
     protected abstract void loadData();
+
 }

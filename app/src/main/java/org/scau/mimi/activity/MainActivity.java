@@ -26,8 +26,10 @@ import com.hitomi.tilibrary.transfer.Transferee;
 import com.nineoldandroids.view.ViewHelper;
 
 import org.jetbrains.annotations.NotNull;
+import org.litepal.crud.DataSupport;
 import org.scau.mimi.R;
 
+import org.scau.mimi.database.User;
 import org.scau.mimi.fragment.ChatFragment;
 import org.scau.mimi.fragment.MomentFragment;
 import org.scau.mimi.gson.MessagesInfo;
@@ -102,8 +104,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-
     }
 
     private void initViews() {
@@ -198,21 +198,35 @@ public class MainActivity extends AppCompatActivity {
         ftbMenu.setOnFoldingItemClickListener(new FoldingTabBar.OnFoldingItemSelectedListener() {
             @Override
             public boolean onFoldingItemSelected(@NotNull MenuItem menuItem) {
+                Fragment fragment = getSupportFragmentManager()
+                        .findFragmentById(R.id.fl_fragment_container);
                 switch (menuItem.getItemId()) {
                     case R.id.activity_main_menu_chat:
                         replaceFragment(new ChatFragment());
                         break;
                     case R.id.activity_main_menu_moment:
-                        replaceFragment(new MomentFragment());
+                        if (fragment != null && fragment instanceof MomentFragment) {
+                            //back to top
+                            ((MomentFragment) fragment).backToTop();
+                        } else {
+                            replaceFragment(MomentFragment.newInstance());
+                        }
                         break;
                     case R.id.activity_main_menu_settings:
-                        replaceFragment(new ChatFragment());
+                        drawerLayout.openDrawer(Gravity.LEFT);
                         break;
                     case R.id.activity_main_menu_personal:
                         replaceFragment(new MomentFragment());
                         break;
                 }
                 return true;
+            }
+        });
+
+        ftbMenu.setOnMainButtonClickListener(new FoldingTabBar.OnMainButtonClickedListener() {
+            @Override
+            public void onMainButtonClicked() {
+                
             }
         });
 
@@ -238,7 +252,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadData() {
-
+        User user = DataSupport.findFirst(User.class);
+        if (user == null) {
+            LoginActivity.actionStart(this);
+            finish();
+        }
     }
 
     public Transferee getTransferee() {
@@ -248,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
     private void addDefaultFragment() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .add(R.id.fl_fragment_container, new MomentFragment())
+                .add(R.id.fl_fragment_container, MomentFragment.newInstance())
                 .commit();
     }
 

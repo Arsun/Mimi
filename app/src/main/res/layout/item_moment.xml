@@ -45,9 +45,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:padding="@dimen/padding_small"
-            tools:targetApi="lollipop">
+            >
 
             <!--昵称，时间，地区-->
                 <TextView
@@ -92,6 +91,8 @@
                     android:text="正文"
                     android:maxLength="200"
                     android:minHeight="100dp"
+                    android:clickable="true"
+                    android:longClickable="true"
                     />
 
             <android.support.percent.PercentRelativeLayout
@@ -105,8 +106,8 @@
 
                 <ImageView
                     android:id="@+id/iv_moment_pic_0"
-                    app:layout_widthPercent="33%"
-                    android:layout_height="100dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:layout_marginTop="@dimen/margin_normal"
                     android:layout_marginBottom="@dimen/margin_normal"
                     android:layout_marginLeft="1dp"
@@ -121,8 +122,8 @@
 
                 <ImageView
                     android:id="@+id/iv_moment_pic_1"
-                    app:layout_widthPercent="33%"
-                    android:layout_height="100dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:background="@android:color/darker_gray"
                     android:layout_marginTop="@dimen/margin_normal"
                     android:layout_marginBottom="@dimen/margin_normal"
@@ -138,8 +139,8 @@
 
                 <ImageView
                     android:id="@+id/iv_moment_pic_2"
-                    app:layout_widthPercent="33%"
-                    android:layout_height="100dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:background="@android:color/darker_gray"
                     android:layout_marginTop="@dimen/margin_normal"
                     android:layout_marginBottom="@dimen/margin_normal"
@@ -228,7 +229,7 @@
                     android:layout_height="15dp"
                     app:allow_random_color="true"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:layout_margin="@dimen/margin_normal"
+                    android:layout_margin="10dp"
                     android:src="@android:color/darker_gray"
                     app:btn_color="@android:color/darker_gray"
                     app:btn_fill_color="#ff0000"

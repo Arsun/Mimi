@@ -87,6 +87,7 @@ public class HttpUtil {
         Glide.with(context)
                 .load(url)
                 .asBitmap()
+                .placeholder(R.drawable.zs)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(imageView);
 

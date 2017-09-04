@@ -18,7 +18,9 @@ import com.dd.CircularProgressButton;
 import org.scau.mimi.R;
 import org.scau.mimi.activity.LoginActivity;
 import org.scau.mimi.base.BaseFragment;
+import org.scau.mimi.gson.Info;
 import org.scau.mimi.util.HttpUtil;
+import org.scau.mimi.util.LogUtil;
 import org.scau.mimi.util.ResponseUtil;
 import org.scau.mimi.util.TextUtil;
 
@@ -162,6 +164,7 @@ public class SignUpFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 LoginActivity.actionStart(getActivity());
+                getActivity().finish();
             }
         });
 
@@ -171,6 +174,10 @@ public class SignUpFragment extends BaseFragment {
             public void onClick(View v) {
 
                 if (TextUtil.isTextVaild(mUsername) && TextUtil.isTextVaild(mPassword) && TextUtil.isTextVaild(mConfirmPassword) && TextUtil.isTextVaild(mAccount)) {
+                    etAccount.setEnabled(false);
+                    etUsername.setEnabled(false);
+                    etPassword.setEnabled(false);
+                    etConfirmPassword.setEnabled(false);
                     cpbSignUp.setProgress(START_SIGN_UP);
                     HttpUtil.signUp(mAccount
                             , mUsername
@@ -179,19 +186,33 @@ public class SignUpFragment extends BaseFragment {
                             , new Callback() {
                         @Override
                         public void onFailure(Call call, IOException e) {
-
+                            etAccount.setEnabled(true);
+                            etUsername.setEnabled(true);
+                            etPassword.setEnabled(true);
+                            etConfirmPassword.setEnabled(true);
                         }
 
                         @Override
                         public void onResponse(Call call, Response response) throws IOException {
-                            String data = ResponseUtil.getString(response);
-                            Log.d(TAG, data);
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    cpbSignUp.setProgress(FINISH_SIGN_UP);
-                                }
-                            });
+                            Info info = ResponseUtil.getInfo(response);
+                            if (info.code == 200) {
+
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        cpbSignUp.setProgress(FINISH_SIGN_UP);
+                                        LoginActivity.actionStart(getActivity());
+                                    }
+                                });
+
+                            } else {
+                                etAccount.setEnabled(true);
+                                etUsername.setEnabled(true);
+                                etPassword.setEnabled(true);
+                                etConfirmPassword.setEnabled(true);
+                                LogUtil.d(TAG, "failed to sign up.");
+                            }
+
                         }
                     });
                 } else {

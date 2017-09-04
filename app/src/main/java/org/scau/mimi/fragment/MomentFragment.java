@@ -179,6 +179,21 @@ public class MomentFragment extends BaseFragment {
 
     }
 
+    public void backToTop() {
+        int position = ((LinearLayoutManager)rvMoment.getLayoutManager())
+                .findLastVisibleItemPosition();
+        if (position <= 20) {
+            rvMoment.smoothScrollToPosition(0);
+        } else {
+            rvMoment.scrollToPosition(0);
+        }
+    }
+
+    public static MomentFragment newInstance() {
+        MomentFragment fragment = new MomentFragment();
+        return fragment;
+    }
+
 //    private void initList() {
 //        mMessageList = new ArrayList<>();
 //        for (int i = 0; i < 15; i++) {

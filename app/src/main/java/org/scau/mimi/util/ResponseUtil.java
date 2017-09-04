@@ -28,6 +28,7 @@ public class ResponseUtil {
         String data = null;
         try {
             data = response.body().string();
+            LogUtil.d(TAG, "getString: " + data);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -64,7 +65,7 @@ public class ResponseUtil {
     }
 
     //测试用，发送message后根据服务器返回数据判断是否发送成功，失败则登录过期，重新登陆
-    public static Info hadSentMessage(Response response) {
+    public static Info getInfo(Response response) {
         String jsonData = getString(response);
         Gson gson = new Gson();
         Info info = gson.fromJson(jsonData, Info.class);

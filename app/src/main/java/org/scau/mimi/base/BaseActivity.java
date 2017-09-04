@@ -18,11 +18,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
 
-        addFragment();
 
         loadData();
         initVariables();
         initViews();
+
+        addFragment();
 
     }
 

@@ -21,7 +21,7 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     protected Fragment createFragment() {
-        return new LoginFragment();
+        return LoginFragment.newInstance();
     }
 
     @Override

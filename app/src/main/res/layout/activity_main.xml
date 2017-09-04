@@ -9,7 +9,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#62cfca"
-    tools:context=".activity.MainActivity"
     >
 
     <RelativeLayout

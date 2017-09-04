@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dd.CircularProgressButton;
@@ -19,6 +20,7 @@ import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 import org.scau.mimi.R;
 import org.scau.mimi.activity.MainActivity;
+import org.scau.mimi.activity.SignUpActivity;
 import org.scau.mimi.base.BaseFragment;
 import org.scau.mimi.database.User;
 import org.scau.mimi.util.HttpUtil;
@@ -56,6 +58,7 @@ public class LoginFragment extends BaseFragment {
     private CircularProgressButton cpbLogin;
     private TextInputLayout tilAccount;
     private TextInputLayout tilPassword;
+    private TextView tvGoToSignUp;
 
     @Nullable
     @Override
@@ -77,6 +80,7 @@ public class LoginFragment extends BaseFragment {
         etPassword = (EditText) view.findViewById(R.id.et_login_password);
         tilAccount = (TextInputLayout) view.findViewById(R.id.til_login_account);
         tilPassword = (TextInputLayout) view.findViewById(R.id.til_login_password);
+        tvGoToSignUp = (TextView) view.findViewById(R.id.tv_login_go_to_sign_up);
 
         etAccount.addTextChangedListener(new TextWatcher() {
             @Override
@@ -116,6 +120,14 @@ public class LoginFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 login();
+            }
+        });
+
+        tvGoToSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SignUpActivity.actionStart(getActivity());
+                getActivity().finish();
             }
         });
 
@@ -164,5 +176,10 @@ public class LoginFragment extends BaseFragment {
             Toast.makeText(getActivity(), "请正确输入账户和密码", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    public static LoginFragment newInstance() {
+        LoginFragment fragment = new LoginFragment();
+        return fragment;
     }
 }

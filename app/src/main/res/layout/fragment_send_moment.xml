@@ -64,7 +64,7 @@
     <android.support.design.widget.TextInputLayout
         android:id="@+id/til_send_moment_edit"
         android:layout_width="match_parent"
-        app:layout_heightPercent="35%"
+        app:layout_heightPercent="40%"
         android:layout_below="@+id/rl_send_moment_header"
         app:hintEnabled="false"
         app:counterEnabled="true"
@@ -76,9 +76,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="top|start"
-            android:lines="7"
-            android:maxLines="7"
+            android:lines="12"
             android:maxLength="200"
+            android:background="@null"
+            android:textSize="15sp"
+            android:hint="说说你的小秘密..."
             />
 
     </android.support.design.widget.TextInputLayout>
@@ -105,7 +107,6 @@
         android:scaleType="centerCrop"
         android:layout_marginLeft="1dp"
         android:clickable="true"
-        android:background="?android:attr/selectableItemBackground"
         />
 
     <ImageView
@@ -118,7 +119,6 @@
         android:scaleType="centerCrop"
         android:layout_marginLeft="1dp"
         android:clickable="true"
-        android:background="?android:attr/selectableItemBackground"
         />
 
     <ImageButton

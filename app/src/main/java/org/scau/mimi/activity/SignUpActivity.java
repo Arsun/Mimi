@@ -1,5 +1,7 @@
 package org.scau.mimi.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,5 +35,10 @@ public class SignUpActivity extends BaseActivity {
     @Override
     protected void loadData() {
 
+    }
+
+    public static void actionStart(Context context) {
+        Intent intent = new Intent(context, SignUpActivity.class);
+        context.startActivity(intent);
     }
 }
