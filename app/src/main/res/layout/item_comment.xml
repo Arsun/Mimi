@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/civ_comment_portrait"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/zs"
+        android:padding="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        />
+
+    <TextView
+        android:id="@+id/tv_comment_nickname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_small"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/civ_comment_portrait"
+        android:textStyle="bold"
+        android:text="Rrong"
+        />
+
+    <TextView
+        android:id="@+id/tv_comment_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_small"
+        android:layout_toRightOf="@+id/civ_comment_portrait"
+        android:layout_below="@+id/tv_comment_nickname"
+        android:text="hhh"
+        />
+
+    <TextView
+        android:id="@+id/tv_comment_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_small"
+        android:layout_toRightOf="@+id/civ_comment_portrait"
+        android:layout_below="@+id/tv_comment_content"
+        android:text="10:10"
+        />
+
+</RelativeLayout>
