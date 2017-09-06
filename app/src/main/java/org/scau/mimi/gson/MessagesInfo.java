@@ -1,5 +1,6 @@
 package org.scau.mimi.gson;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -17,16 +18,18 @@ public class MessagesInfo {
 
     public class Content {
 
+        public long tmBefore;
+
+        public long tmAfter;
+
         public List<Message> messageList ;
 
-        public Page page;
-
-        public class Message {
+        public class Message implements Serializable {
             public int mid;
 
             public int uid;
 
-            public User user;
+            public LoginInfo.Content.User user;
 
             public String content;
 
@@ -48,17 +51,8 @@ public class MessagesInfo {
 
             public boolean isLike;
 
-            public class User {
-                public int uid;
 
-                public String uname;
-
-                public String nname;
-
-                public long tmCreated;
-            }
-
-            public class MessageImageSet {
+            public class MessageImageSet implements Serializable{
                 public int imageid;
 
                 public String webPath;
@@ -67,7 +61,7 @@ public class MessagesInfo {
 
             }
 
-            public class Location {
+            public class Location implements Serializable{
                 public int lid;
 
                 public String locale;
@@ -76,21 +70,10 @@ public class MessagesInfo {
 
         }
 
-        public class Page {
-            public int itemPerPage;
+        public int numThisPage;
 
-            public int pageNum;
+        public int numPerPage;
 
-            public int item;
-
-            public int page;
-
-            public int firstItem;
-
-            public int itemInThisPage;
-
-            public int first;
-        }
 
     }
 

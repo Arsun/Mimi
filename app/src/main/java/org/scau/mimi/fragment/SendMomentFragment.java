@@ -51,6 +51,7 @@ import org.scau.mimi.base.BaseFragment;
 import org.scau.mimi.gson.ImagesInfo;
 import org.scau.mimi.gson.Info;
 import org.scau.mimi.other.Constants;
+import org.scau.mimi.other.MyApplication;
 import org.scau.mimi.util.HttpUtil;
 import org.scau.mimi.util.LogUtil;
 import org.scau.mimi.util.ResponseUtil;
@@ -498,12 +499,13 @@ public class SendMomentFragment extends BaseFragment {
                                         }
                                     });
                                     //处理草稿箱逻辑
+                                    MyApplication.finishAllActivities();
                                     LoginActivity.actionStart(getActivity());
                                 } else {
-                                    MainActivity.actionStart(getActivity());
+                                    getActivity().finish();
                                 }
 
-                                getActivity().finish();
+//                                getActivity().finish();
                             }
                         });
                     } else if (num == 1) {
@@ -571,12 +573,13 @@ public class SendMomentFragment extends BaseFragment {
                                             }
                                         });
                                         //处理草稿箱逻辑
+                                        MyApplication.finishAllActivities();
                                         LoginActivity.actionStart(getActivity());
                                     } else {
-                                        MainActivity.actionStart(getActivity());
+                                        getActivity().finish();
                                     }
 
-                                    getActivity().finish();
+//                                    getActivity().finish();
                                 }
                             });
                         }
@@ -708,12 +711,13 @@ public class SendMomentFragment extends BaseFragment {
                                             }
                                         });
                                         //处理草稿箱逻辑
+                                        MyApplication.finishAllActivities();
                                         LoginActivity.actionStart(getActivity());
                                     } else {
-                                        MainActivity.actionStart(getActivity());
+                                        getActivity().finish();
                                     }
 
-                                    getActivity().finish();
+//                                    getActivity().finish();
                                 }
                             });
                         }
@@ -926,12 +930,13 @@ public class SendMomentFragment extends BaseFragment {
                                             }
                                         });
                                         //处理草稿箱逻辑
+                                        MyApplication.finishAllActivities();
                                         LoginActivity.actionStart(getActivity());
                                     } else {
-                                        MainActivity.actionStart(getActivity());
+                                        getActivity().finish();
                                     }
 
-                                    getActivity().finish();
+//                                    getActivity().finish();
                                 }
                             });
                         }

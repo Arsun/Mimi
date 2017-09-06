@@ -2,6 +2,7 @@ package org.scau.mimi.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,10 +17,9 @@ import com.hitomi.tilibrary.transfer.TransferConfig;
 import com.sackcentury.shinebuttonlib.ShineButton;
 
 import org.scau.mimi.R;
+import org.scau.mimi.activity.CommentActivity;
 import org.scau.mimi.activity.MainActivity;
-import org.scau.mimi.activity.PictureActivity;
 import org.scau.mimi.gson.MessagesInfo;
-import org.scau.mimi.other.Constants;
 import org.scau.mimi.util.HttpUtil;
 import org.scau.mimi.util.LogUtil;
 import org.scau.mimi.util.TextUtil;
@@ -45,6 +45,8 @@ public class MomentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
      static class NormalViewHolder extends RecyclerView.ViewHolder {
          Context mContext;
 
+         View view;
+         CardView cvMoment;
          CircleImageView civPortrait;
          TextView tvNickname;
          TextView tvPostTime;
@@ -61,27 +63,48 @@ public class MomentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
              super(itemView);
              mContext = itemView.getContext();
 
-
-
-            tvNickname = (TextView) itemView.findViewById(R.id.tv_nickname);
-            tvPostTime = (TextView) itemView.findViewById(R.id.tv_post_time);
-            tvLocation = (TextView) itemView.findViewById(R.id.tv_location);
-            tvTextContent = (TextView) itemView.findViewById(R.id.tv_moment_text_content);
-            sbLikeButton = (ShineButton) itemView.findViewById(R.id.sb_like_button);
-            atsLikeNumber = (AdvTextSwitcher) itemView.findViewById(R.id.ats_like_number);
-            atsCommentNumber = (AdvTextSwitcher) itemView.findViewById(R.id.ats_comment_number);
-            ivMomentPic0 = (ImageView) itemView.findViewById(R.id.iv_moment_pic_0);
-            ivMomentPic1 = (ImageView) itemView.findViewById(R.id.iv_moment_pic_1);
-            ivMomentPic2 = (ImageView) itemView.findViewById(R.id.iv_moment_pic_2);
-        }
+             view = itemView;
+             cvMoment = (CardView) itemView.findViewById(R.id.cv_moment);
+             tvNickname = (TextView) itemView.findViewById(R.id.tv_moment_nickname);
+             tvPostTime = (TextView) itemView.findViewById(R.id.tv_moment_post_time);
+             tvLocation = (TextView) itemView.findViewById(R.id.tv_moment_location);
+             tvTextContent = (TextView) itemView.findViewById(R.id.tv_moment_text_content);
+             sbLikeButton = (ShineButton) itemView.findViewById(R.id.sb_moment_like_button);
+             atsLikeNumber = (AdvTextSwitcher) itemView.findViewById(R.id.ats_moment_like_number);
+             atsCommentNumber = (AdvTextSwitcher) itemView.findViewById(R.id.ats_moment_comment_number);
+             ivMomentPic0 = (ImageView) itemView.findViewById(R.id.iv_moment_pic_0);
+             ivMomentPic1 = (ImageView) itemView.findViewById(R.id.iv_moment_pic_1);
+             ivMomentPic2 = (ImageView) itemView.findViewById(R.id.iv_moment_pic_2);
+         }
 
         public void bind(final MessagesInfo.Content.Message message) {
             final List<String> picUrls;
             picUrls = new ArrayList<>();
             for (int i = 0; i < message.messageImageSet.size(); i++) {
-                picUrls.add(Constants.ADDRESS + message.messageImageSet.get(i).webPath);
+                picUrls.add(HttpUtil.ADDRESS + message.messageImageSet.get(i).webPath);
             }
 
+//            cvMoment.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    CommentActivity.actionStart(mContext);
+//                }
+//            });
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    CommentActivity.actionStart(mContext, message.mid);
+
+                    CommentActivity.actionStartByTransition((Activity)mContext, message);
+
+//                    List<View> sharedViews = new ArrayList<View>();
+//                    sharedViews.add(civPortrait);
+//                    sharedViews.add(ivMomentPic0);
+//                    CommentActivity.actionStartBySharingElement((Activity)mContext
+//                    , message.mid
+//                    , sharedViews);
+                }
+            });
 
             if (message.isFake)
                 tvNickname.setText(message.fakeName);
@@ -119,22 +142,22 @@ public class MomentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             int picNum = message.messageImageSet.size();
             LogUtil.d(TAG, "picNum: " + picNum);
             if (picNum == 3) {
-                HttpUtil.loadImageByGlide(mContext, picUrls.get(0), ivMomentPic0);
-                HttpUtil.loadImageByGlide(mContext, picUrls.get(1), ivMomentPic1);
-                HttpUtil.loadImageByGlide(mContext, picUrls.get(2), ivMomentPic2);
+                HttpUtil.loadImageByGlide(mContext, message.messageImageSet.get(0).webPath, ivMomentPic0);
+                HttpUtil.loadImageByGlide(mContext, message.messageImageSet.get(1).webPath, ivMomentPic1);
+                HttpUtil.loadImageByGlide(mContext, message.messageImageSet.get(2).webPath, ivMomentPic2);
                 ivMomentPic0.setVisibility(View.VISIBLE);
                 ivMomentPic1.setVisibility(View.VISIBLE);
                 ivMomentPic2.setVisibility(View.VISIBLE);
 
             } else if (picNum == 2) {
-                HttpUtil.loadImageByGlide(mContext, picUrls.get(0), ivMomentPic0);
-                HttpUtil.loadImageByGlide(mContext, picUrls.get(1), ivMomentPic1);
+                HttpUtil.loadImageByGlide(mContext, message.messageImageSet.get(0).webPath, ivMomentPic0);
+                HttpUtil.loadImageByGlide(mContext, message.messageImageSet.get(1).webPath, ivMomentPic1);
                 ivMomentPic0.setVisibility(View.VISIBLE);
                 ivMomentPic1.setVisibility(View.VISIBLE);
                 ivMomentPic2.setVisibility(View.GONE);
 
             } else if (picNum == 1) {
-                HttpUtil.loadImageByGlide(mContext, picUrls.get(0), ivMomentPic0);
+                HttpUtil.loadImageByGlide(mContext, message.messageImageSet.get(0).webPath, ivMomentPic0);
                 ivMomentPic0.setVisibility(View.VISIBLE);
                 ivMomentPic1.setVisibility(View.GONE);
                 ivMomentPic2.setVisibility(View.GONE);

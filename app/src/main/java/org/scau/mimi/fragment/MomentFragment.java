@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.hitomi.tilibrary.transfer.Transferee;
 import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 
@@ -24,6 +23,7 @@ import org.scau.mimi.util.ResponseUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import okhttp3.Call;
@@ -48,7 +48,8 @@ public class MomentFragment extends BaseFragment {
     private MainActivity mActivity;
     private GestureDetectorCompat mGestureDetectorCompat;
     private View mRootView;
-    private int nextPage;
+    private long mTimeAfter;
+    private long mTimeBefore;
 
 
     @Override
@@ -77,7 +78,9 @@ public class MomentFragment extends BaseFragment {
     @Override
     protected void initVariables() {
         mMessageList = new ArrayList<>();
-        nextPage = 1;
+        mTimeAfter = new Date().getTime();
+        mTimeBefore = mTimeAfter;
+        LogUtil.d(TAG, "initTimeAfter: " + mTimeAfter);
 
     }
 
@@ -91,7 +94,8 @@ public class MomentFragment extends BaseFragment {
         trlRefreshMoment.setOnRefreshListener(new RefreshListenerAdapter() {
             @Override
             public void onRefresh(TwinklingRefreshLayout refreshLayout) {
-                HttpUtil.requestMessages(0, new Callback() {
+                LogUtil.d(TAG, "onRefresh: " + mTimeAfter);
+                HttpUtil.requestMessagesAfter(mTimeAfter, new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         LogUtil.d(TAG, "failed to request messages.");
@@ -109,6 +113,10 @@ public class MomentFragment extends BaseFragment {
                                 .getMessagesInfo(response);
                         List<MessagesInfo.Content.Message> messages = messagesInfo.content.messageList;
                         mMessageList.addAll(0, messages);
+                        mTimeAfter = mMessageList.get(0).tmCreated + 1;
+                        mTimeBefore = mMessageList.get(mMessageList.size() - 1).tmCreated - 1;
+                        LogUtil.d(TAG, "newTimeAfter: " + mTimeAfter);
+
 //                        for (int i = 0; i < messages.size(); i++) {
 //                            if (i != messages.size() - 1) {
 //                                if (messages.get(i).mid != messages.get(i + 1).mid) {
@@ -133,7 +141,8 @@ public class MomentFragment extends BaseFragment {
 
             @Override
             public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
-                HttpUtil.requestMessages(nextPage, new Callback() {
+                LogUtil.d(TAG, "onLoadMore: " + mTimeBefore);
+                HttpUtil.requestMessagesBefore(mTimeBefore, new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         LogUtil.d(TAG, "failed to load more.");
@@ -148,9 +157,11 @@ public class MomentFragment extends BaseFragment {
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
                         MessagesInfo messagesInfo = ResponseUtil.getMessagesInfo(response);
-                        nextPage++;
-                        mMessageList.addAll(messagesInfo.content.messageList);
-
+                        List<MessagesInfo.Content.Message> messages = messagesInfo.content.messageList;
+                        mMessageList.addAll(messages);
+                        mTimeAfter = mMessageList.get(0).tmCreated + 1;
+                        mTimeBefore = mMessageList.get(mMessageList.size() - 1).tmCreated - 1;
+                        LogUtil.d(TAG, "newTimeBefore: " + mTimeBefore);
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -162,6 +173,10 @@ public class MomentFragment extends BaseFragment {
                 });
             }
         });
+
+//        trlRefreshMoment.startRefresh();
+
+        trlRefreshMoment.onLoadMore(trlRefreshMoment);
 
 
 //        rvMoment.setOnTouchListener(new View.OnTouchListener() {

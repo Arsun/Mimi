@@ -1,7 +1,6 @@
 package org.scau.mimi.adapter;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +33,7 @@ public class LocationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public NormalViewHolder(View itemView) {
             super(itemView);
 
-            tvLocation = (TextView) itemView.findViewById(R.id.tv_location);
+            tvLocation = (TextView) itemView.findViewById(R.id.tv_moment_location);
         }
 
         public void bind(MessagesInfo.Content.Message.Location location) {

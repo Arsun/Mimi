@@ -13,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Explode;
+import android.transition.Slide;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -73,8 +75,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        UltimateBar ultimateBar = new UltimateBar(this);
-        ultimateBar.setTransparentBar(Color.parseColor("#000000"), 127);
+
+
+//        UltimateBar ultimateBar = new UltimateBar(this);
+//        ultimateBar.setTransparentBar(Color.parseColor("#000000"), 127);
 //        ultimateBar.setHintBar();下拉通知才显示，平时隐藏状态栏
 //        ultimateBar.setColorBarForDrawer(Color.parseColor("#4a4a52"), 50);
 

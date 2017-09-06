@@ -1,5 +1,7 @@
 package org.scau.mimi.gson;
 
+import java.io.Serializable;
+
 /**
  * Created by 10313 on 2017/8/23.
  */
@@ -22,7 +24,7 @@ public class LoginInfo {
 
         public long tmExpire;
 
-        public class User {
+        public class User implements Serializable{
             public int uid;
 
             public String uname;

@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import org.scau.mimi.gson.CommentsInfo;
 import org.scau.mimi.gson.ImagesInfo;
 import org.scau.mimi.gson.LocationsInfo;
 import org.scau.mimi.gson.LoginInfo;
@@ -38,7 +39,6 @@ public class ResponseUtil {
 
     public static MessagesInfo getMessagesInfo(Response response) {
         String jsonData = getString(response);
-        LogUtil.d(TAG, "getMessagesInfo: " + jsonData);
         Gson gson = new Gson();
         return gson.fromJson(jsonData, MessagesInfo.class);
     }
@@ -72,6 +72,13 @@ public class ResponseUtil {
 
         return info;
 
+    }
+
+    public static CommentsInfo getCommentsInfo(Response response) {
+        String jsonData = getString(response);
+        Gson gson = new Gson();
+        CommentsInfo commentsInfo = gson.fromJson(jsonData, CommentsInfo.class);
+        return commentsInfo;
     }
 
 }

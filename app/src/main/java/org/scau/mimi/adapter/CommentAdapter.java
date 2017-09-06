@@ -7,7 +7,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.scau.mimi.R;
+import org.scau.mimi.gson.CommentsInfo;
+import org.scau.mimi.util.TextUtil;
 
+import java.util.Date;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -18,10 +21,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    List<String> mList;
+    List<CommentsInfo.Content.Comment> mComments;
 
-    public CommentAdapter(List<String> list) {
-        mList = list;
+    public CommentAdapter(List<CommentsInfo.Content.Comment> comments) {
+        mComments = comments;
     }
 
     static class CommentViewHolder extends RecyclerView.ViewHolder {
@@ -40,8 +43,10 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             tvCommentTime = (TextView) itemView.findViewById(R.id.tv_comment_time);
         }
 
-        public void bind(String s) {
-            tvCommentContent.setText(s);
+        public void bind(CommentsInfo.Content.Comment comment) {
+            tvCommentContent.setText(comment.content);
+            tvCommentNickname.setText(comment.user.nname);
+            tvCommentTime.setText(TextUtil.dateToString(new Date(comment.tmCreated)));
         }
 
     }
@@ -53,11 +58,11 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((CommentViewHolder)holder).bind(mList.get(position));
+        ((CommentViewHolder)holder).bind(mComments.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return mList.size();
+        return mComments.size();
     }
 }

@@ -19,10 +19,12 @@ import com.dd.CircularProgressButton;
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 import org.scau.mimi.R;
+import org.scau.mimi.activity.CommentActivity;
 import org.scau.mimi.activity.MainActivity;
 import org.scau.mimi.activity.SignUpActivity;
 import org.scau.mimi.base.BaseFragment;
 import org.scau.mimi.database.User;
+import org.scau.mimi.other.MyApplication;
 import org.scau.mimi.util.HttpUtil;
 import org.scau.mimi.util.ResponseUtil;
 import org.scau.mimi.util.TextUtil;
@@ -166,7 +168,11 @@ public class LoginFragment extends BaseFragment {
                         @Override
                         public void run() {
                             cpbLogin.setProgress(FINISH_LOGIN);
-                            MainActivity.actionStart(getActivity());
+                            if (MyApplication.findActivity(CommentActivity.class)) {
+                                getActivity().finish();
+                            } else {
+                                MainActivity.actionStart(getActivity());
+                            }
                         }
                     });
                 }

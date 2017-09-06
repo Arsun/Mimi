@@ -15,6 +15,7 @@ import org.scau.mimi.R;
 import org.scau.mimi.activity.CommentActivity;
 import org.scau.mimi.adapter.CommentAdapter;
 import org.scau.mimi.base.BaseFragment;
+import org.scau.mimi.gson.CommentsInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class CommentFrament extends BaseFragment {
 
     //Variables
     //Test
-    private List<String> mList;
+    private List<CommentsInfo.Content.Comment> mCommentList;
 
 
     @Nullable
@@ -61,7 +62,7 @@ public class CommentFrament extends BaseFragment {
         rvComment = (RecyclerView) view.findViewById(R.id.rv_comment);
         rvComment.setLayoutManager(new LinearLayoutManager(getActivity()));
         initList();
-        rvComment.setAdapter(new CommentAdapter(mList));
+        rvComment.setAdapter(new CommentAdapter(mCommentList));
 
         ctbl = (CollapsingToolbarLayout) view.findViewById(R.id.ctbl_comment_collapsing_toolbar);
 //        ctbl.setTitle("enenene");
@@ -82,10 +83,10 @@ public class CommentFrament extends BaseFragment {
     }
 
     private void initList() {
-        mList = new ArrayList<>();
-        for (int i = 0; i < 30; i++) {
-            mList.add("hhhhh");
-        }
+//        mList = new ArrayList<>();
+//        for (int i = 0; i < 30; i++) {
+//            mList.add("hhhhh");
+//        }
 
     }
 

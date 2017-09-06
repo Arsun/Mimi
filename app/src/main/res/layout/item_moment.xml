@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cv_moment"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/margin_normal"
@@ -50,7 +51,7 @@
 
             <!--昵称，时间，地区-->
                 <TextView
-                    android:id="@+id/tv_nickname"
+                    android:id="@+id/tv_moment_nickname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
@@ -59,17 +60,17 @@
                     />
 
                 <TextView
-                    android:id="@+id/tv_post_time"
+                    android:id="@+id/tv_moment_post_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_below="@id/tv_nickname"
+                    android:layout_below="@id/tv_moment_nickname"
                     android:textSize="12sp"
                     android:text="时间"
                     />
 
                 <TextView
-                    android:id="@+id/tv_location"
+                    android:id="@+id/tv_moment_location"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -85,7 +86,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/tv_post_time"
+                    android:layout_below="@+id/tv_moment_post_time"
                     android:gravity="center|start"
                     android:padding="@dimen/padding_normal"
                     android:text="正文"
@@ -115,7 +116,7 @@
                     android:background="@android:color/darker_gray"
                     android:scaleType="centerCrop"
                     android:clickable="true"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     android:transitionName="@string/image_transition"
 
                     />
@@ -132,7 +133,7 @@
                     android:scaleType="centerCrop"
                     android:clickable="true"
                     android:layout_toRightOf="@id/iv_moment_pic_0"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     android:transitionName="@string/image_transition"
 
                     />
@@ -149,7 +150,7 @@
                     android:scaleType="centerCrop"
                     android:clickable="true"
                     android:layout_toRightOf="@id/iv_moment_pic_1"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     android:transitionName="@string/image_transition"
 
                     />
@@ -224,7 +225,7 @@
                 <!--&gt;</LinearLayout>-->
 
                 <com.sackcentury.shinebuttonlib.ShineButton
-                    android:id="@+id/sb_like_button"
+                    android:id="@+id/sb_moment_like_button"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     app:allow_random_color="true"
@@ -239,11 +240,11 @@
                     />
 
                 <sumimakito.android.advtextswitcher.AdvTextSwitcher
-                    android:id="@+id/ats_like_number"
+                    android:id="@+id/ats_moment_like_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:textSize="10sp"
-                    android:layout_toRightOf="@+id/sb_like_button"
+                    android:layout_toRightOf="@+id/sb_moment_like_button"
                     android:layout_alignParentBottom="true"
                     />
 
@@ -255,7 +256,7 @@
                     <!--/>-->
 
                 <ImageView
-                    android:id="@+id/iv_pic_comment_number"
+                    android:id="@+id/iv_moment_pic_comment_number"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:src="@drawable/ic_moment_comment"
@@ -264,11 +265,11 @@
                     />
 
                 <sumimakito.android.advtextswitcher.AdvTextSwitcher
-                    android:id="@+id/ats_comment_number"
+                    android:id="@+id/ats_moment_comment_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:textSize="10sp"
-                    android:layout_toRightOf="@+id/iv_pic_comment_number"
+                    android:layout_toRightOf="@+id/iv_moment_pic_comment_number"
                     android:layout_alignParentBottom="true"
                     />
 
