@@ -2,7 +2,7 @@ package org.scau.mimi.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.IntentFilter;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.v4.app.Fragment;
@@ -11,12 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.transition.Explode;
-import android.transition.Slide;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -35,10 +30,11 @@ import org.scau.mimi.database.User;
 import org.scau.mimi.fragment.ChatFragment;
 import org.scau.mimi.fragment.MomentFragment;
 import org.scau.mimi.gson.MessagesInfo;
+import org.scau.mimi.SingleInstance.Client;
+import org.scau.mimi.receiver.NetworkChangeReceiver;
 import org.scau.mimi.util.HttpUtil;
 import org.scau.mimi.util.LogUtil;
 import org.scau.mimi.util.ResponseUtil;
-import org.zackratos.ultimatebar.UltimateBar;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,6 +44,9 @@ import client.yalantis.com.foldingtabbar.FoldingTabBar;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
+import rx.functions.Action1;
+import ua.naiksoftware.stomp.LifecycleEvent;
+import ua.naiksoftware.stomp.client.StompClient;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
     //Variables
     private int mOriginFtbMenuTop;
     private List<MessagesInfo.Content.Message.Location> mLocations;
+    private Client mClient;
+    private NetworkChangeReceiver mReceiver;
     //Test
     private Transferee mTransferee;
 
@@ -89,8 +90,6 @@ public class MainActivity extends AppCompatActivity {
         initViews();
 
 
-//        StatusBarUtil.setColor(this, 0x454e5f, 122);
-//        StatusBarUtil.setTransparent(this);
     }
 
     @Override
@@ -108,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(mReceiver);
     }
 
     private void initViews() {
@@ -250,6 +250,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void initVariables() {
 
+        mReceiver = new NetworkChangeReceiver();
+        registerReceiver(mReceiver,
+                new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+
         mLocations = new ArrayList<>();
 
 
@@ -261,6 +265,12 @@ public class MainActivity extends AppCompatActivity {
             LoginActivity.actionStart(this);
             finish();
         }
+
+
+//        mClient = Client.getInstance(user.getSecret());
+//        mClient.conncectServer();
+
+
     }
 
     public Transferee getTransferee() {
@@ -323,10 +333,5 @@ public class MainActivity extends AppCompatActivity {
         context.startActivity(intent);
     }
 
-
-//    private List<MessagesInfo.Content.Message.Location> initLocationList() {
-//        for (i = 0; i < 5; i++) {
-//        }
-//    }
 
 }

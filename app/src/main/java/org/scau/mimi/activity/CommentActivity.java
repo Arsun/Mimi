@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -21,21 +22,28 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hitomi.glideloader.GlideImageLoader;
+import com.hitomi.tilibrary.style.index.NumberIndexIndicator;
+import com.hitomi.tilibrary.style.progress.ProgressBarIndicator;
+import com.hitomi.tilibrary.transfer.TransferConfig;
+import com.hitomi.tilibrary.transfer.Transferee;
 import com.sackcentury.shinebuttonlib.ShineButton;
 
 import org.scau.mimi.R;
 import org.scau.mimi.adapter.CommentAdapter;
+import org.scau.mimi.gson.Comment;
 import org.scau.mimi.gson.CommentsInfo;
 import org.scau.mimi.gson.Info;
 import org.scau.mimi.gson.MessagesInfo;
 import org.scau.mimi.util.HttpUtil;
 import org.scau.mimi.util.LogUtil;
+import org.scau.mimi.util.NetworkUtil;
 import org.scau.mimi.util.ResponseUtil;
 import org.scau.mimi.util.TextUtil;
+import org.scau.mimi.util.ToastUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -76,7 +84,6 @@ public class CommentActivity extends AppCompatActivity {
     private Toolbar tbToolbar;
     private RecyclerView rvComment;
     private TextView tvAllComment;
-    private ProgressBar pbCommentRefresh;
     private EditText etWriteComment;
     private Button btnSendComment;
 
@@ -90,8 +97,13 @@ public class CommentActivity extends AppCompatActivity {
     private String mComment;
     private long mTimeAfter;
     private long mTimeBefore;
+    private Transferee mTransferee;
+    private boolean mIsOnLoadMore;
+    private boolean mIsOnRefresh;
+    private boolean mCanLoadMore;
+    private boolean mCanRefresh;
     //Test
-    private List<CommentsInfo.Content.Comment> mCommentList;
+    private List<Comment> mCommentList;
 
 
     @Override
@@ -111,6 +123,18 @@ public class CommentActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        mTransferee = Transferee.getDefault(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mTransferee.destroy();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -125,8 +149,11 @@ public class CommentActivity extends AppCompatActivity {
     }
 
     private void initVariables() {
+        mCommentList = new ArrayList<>();
         mPicList = new ArrayList<>();
         mComment = "";
+        mIsOnLoadMore = false;
+        mIsOnRefresh = false;
     }
 
     private void initViews() {
@@ -146,7 +173,6 @@ public class CommentActivity extends AppCompatActivity {
         tbToolbar = (Toolbar)findViewById(R.id.tb_comment_toolbar);
         rvComment = (RecyclerView)findViewById(R.id.rv_comment);
         tvAllComment = (TextView) findViewById(R.id.tv_comment_all_comment);
-        pbCommentRefresh = (ProgressBar) findViewById(R.id.pb_comment_refresh);
         etWriteComment = (EditText) findViewById(R.id.et_comment_write_comment);
         btnSendComment = (Button) findViewById(R.id.btn_comment_send_comment);
 
@@ -166,9 +192,32 @@ public class CommentActivity extends AppCompatActivity {
         mPicList.add(ivMomentPic0);
         mPicList.add(ivMomentPic1);
         mPicList.add(ivMomentPic2);
+        final List<String> picUrls = new ArrayList<>();
+        for (MessagesInfo.Content.Message.MessageImageSet mis :
+                mMessage.messageImageSet) {
+            picUrls.add(HttpUtil.ADDRESS + mis.webPath);
+        }
         for (int i = 0; i < mMessage.messageImageSet.size(); i++) {
             HttpUtil.loadImageByGlide(this, mMessage.messageImageSet.get(i).webPath, mPicList.get(i));
             mPicList.get(i).setVisibility(View.VISIBLE);
+
+            final int finalI = i;
+            mPicList.get(i).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    TransferConfig config = TransferConfig.build()
+                            .setOriginImageList(mPicList)
+                            .setSourceImageList(picUrls)
+                            .setNowThumbnailIndex(finalI)
+                            .setMissDrawable(getResources().getDrawable(R.drawable.zs))
+                            .setErrorDrawable(getResources().getDrawable(R.drawable.zs))
+                            .setIndexIndicator(new NumberIndexIndicator())
+                            .setProgressIndicator(new ProgressBarIndicator())
+                            .setImageLoader(GlideImageLoader.with(CommentActivity.this))
+                            .create();
+                    mTransferee.apply(config).show();
+                }
+            });
         }
         
 
@@ -201,64 +250,17 @@ public class CommentActivity extends AppCompatActivity {
         tvAllComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pbCommentRefresh.setVisibility(View.VISIBLE);
-                if (mCommentList.size() != 0) {
-                    HttpUtil.requestCommentsAfter(mMessage.mid, mTimeAfter, new Callback() {
-                        @Override
-                        public void onFailure(Call call, IOException e) {
+                if (NetworkUtil.isNetworkAvailable(CommentActivity.this)) {
+                    if (!mIsOnLoadMore && !mIsOnRefresh) {
+                        mIsOnRefresh = true;
+                        onRefreshComment();
+                    }
 
-                        }
-
-                        @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-                            CommentsInfo commentsInfo = ResponseUtil.getCommentsInfo(response);
-                            mCommentList.addAll(0, commentsInfo.content.commentList);
-                            LogUtil.d(TAG, "comment num: " + mCommentList.size());
-                            if (mCommentList.size() != 0) {
-                                mTimeAfter = mCommentList.get(0).tmCreated + 1;
-                                mTimeBefore = mCommentList.get(mCommentList.size() - 1).tmCreated - 1;
-                            } else {
-                                mTimeAfter = new Date().getTime();
-                                mTimeBefore = mTimeAfter;
-                            }
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    pbCommentRefresh.setVisibility(View.GONE);
-                                    rvComment.getAdapter().notifyDataSetChanged();
-                                }
-                            });
-                        }
-                    });
                 } else {
-                    HttpUtil.requestCommentsBefore(mMessage.mid, mTimeBefore, new Callback() {
-                        @Override
-                        public void onFailure(Call call, IOException e) {
-
-                        }
-
-                        @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-                            CommentsInfo commentsInfo = ResponseUtil.getCommentsInfo(response);
-                            mCommentList.addAll(commentsInfo.content.commentList);
-                            LogUtil.d(TAG, "comment num: " + mCommentList.size());
-                            if (mCommentList.size() != 0) {
-                                mTimeAfter = mCommentList.get(0).tmCreated + 1;
-                                mTimeBefore = mCommentList.get(mCommentList.size() - 1).tmCreated - 1;
-                            } else {
-                                mTimeAfter = new Date().getTime();
-                                mTimeBefore = mTimeAfter;
-                            }
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    pbCommentRefresh.setVisibility(View.GONE);
-                                    rvComment.getAdapter().notifyDataSetChanged();
-                                }
-                            });
-                        }
-                    });
+                    ToastUtil.toastWhenOnUiThread("网络不可用");
                 }
+
+
 
             }
         });
@@ -287,44 +289,160 @@ public class CommentActivity extends AppCompatActivity {
             }
         });
 
-        rvComment.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        rvComment.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                if (pbCommentRefresh.getVisibility() != View.VISIBLE) {
-                    if (!rvComment.canScrollVertically(1)) {
-                        HttpUtil.requestCommentsBefore(mMessage.mid, mTimeBefore, new Callback() {
-                            @Override
-                            public void onFailure(Call call, IOException e) {
-
-                            }
-
-                            @Override
-                            public void onResponse(Call call, Response response) throws IOException {
-                                CommentsInfo commentsInfo = ResponseUtil.getCommentsInfo(response);
-                                mCommentList.addAll(commentsInfo.content.commentList);
-                                LogUtil.d(TAG, "comment num: " + mCommentList.size());
-                                if (mCommentList.size() != 0) {
-                                    mTimeAfter = mCommentList.get(0).tmCreated + 1;
-                                    mTimeBefore = mCommentList.get(mCommentList.size() - 1).tmCreated - 1;
-                                } else {
-                                    mTimeAfter = new Date().getTime();
-                                    mTimeBefore = mTimeAfter;
-                                }
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        rvComment.getAdapter().notifyDataSetChanged();
-                                    }
-                                });
-                            }
-                        });
-                    }
+                if (!mIsOnRefresh && !mIsOnLoadMore && !recyclerView.canScrollVertically(1) && mCommentList.size() != 0
+                        && mCommentList.get(mCommentList.size() - 1).type != Comment.TYPE_NO_MORE) {
+                    mIsOnLoadMore = true;
+                    onLoadMoreComment();
                 }
             }
         });
 
+        if (NetworkUtil.isNetworkAvailable(this)) {
+            mIsOnRefresh = true;
+            onRefreshComment();
+
+        } else {
+            ToastUtil.toastWhenOnUiThread("网络不可用");
+        }
 
 
+
+    }
+
+    private void onLoadMoreComment() {
+        Comment comment = new Comment();
+        comment.type = Comment.TYPE_FOOTER;
+        mCommentList.add(comment);
+        rvComment.getAdapter().notifyDataSetChanged();
+
+        HttpUtil.requestCommentsBefore(mMessage.mid, mTimeBefore, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ToastUtil.toastWhenOnUiThread("加载失败");
+                        mCommentList.remove(mCommentList.size() - 1);
+                        rvComment.getAdapter().notifyDataSetChanged();
+                        mIsOnLoadMore = false;
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final CommentsInfo commentsInfo = ResponseUtil.getCommentsInfo(response);
+                List<Comment> comments = commentsInfo.content.commentList;
+                if (comments.size() != 0) {
+                    mCommentList.addAll(mCommentList.size() - 1, comments);
+                    mTimeAfter = mCommentList.get(0).tmCreated + 1;
+                    mTimeBefore = mCommentList.get(mCommentList.size() - 2).tmCreated - 1;
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (commentsInfo.content.numThisPage < commentsInfo.content.numPerPage) {
+                            Comment c = new Comment();
+                            c.type = Comment.TYPE_NO_MORE;
+                            mCommentList.add(mCommentList.size() - 1, c);
+                        }
+                        mCommentList.remove(mCommentList.size() - 1);
+                        rvComment.getAdapter().notifyDataSetChanged();
+                        mIsOnLoadMore = false;
+                    }
+                });
+            }
+        });
+
+
+    }
+
+    private void onRefreshComment() {
+        Comment comment = new Comment();
+        comment.type = Comment.TYPE_HEADER;
+        mCommentList.add(0, comment);
+        rvComment.smoothScrollToPosition(0);
+        rvComment.getAdapter().notifyDataSetChanged();
+
+        if (mCommentList.size() > 1) {
+            HttpUtil.requestCommentsAfter(mMessage.mid, mTimeAfter, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ToastUtil.toastWhenOnUiThread("加载失败");
+                            mCommentList.remove(0);
+                            rvComment.getAdapter().notifyDataSetChanged();
+                            mIsOnRefresh = false;
+                        }
+                    });
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    CommentsInfo commentsInfo = ResponseUtil.getCommentsInfo(response);
+                    List<Comment> comments = commentsInfo.content.commentList;
+                    mCommentList.remove(0);
+                    if (comments.size() != 0) {
+                        mCommentList.addAll(0, comments);
+                        mTimeAfter = mCommentList.get(0).tmCreated + 1;
+                        mTimeBefore = mCommentList.get(mCommentList.size() - 1).tmCreated - 1;
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            rvComment.getAdapter().notifyDataSetChanged();
+                            mIsOnRefresh = false;
+                        }
+                    });
+                }
+            });
+        } else {
+            HttpUtil.requestCommentsBefore(mMessage.mid, mTimeBefore, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ToastUtil.toastWhenOnUiThread("加载失败");
+                            mCommentList.remove(0);
+                            rvComment.getAdapter().notifyDataSetChanged();
+                            mIsOnRefresh = false;
+                        }
+                    });
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    final CommentsInfo commentsInfo = ResponseUtil.getCommentsInfo(response);
+                    List<Comment> comments = commentsInfo.content.commentList;
+                    mCommentList.remove(0);
+                    if (comments.size() != 0) {
+                        mCommentList.addAll(0, comments);
+                        mTimeAfter = mCommentList.get(0).tmCreated + 1;
+                        mTimeBefore = mCommentList.get(mCommentList.size() - 1).tmCreated - 1;
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            if (commentsInfo.content.numThisPage < commentsInfo.content.numPerPage) {
+                                Comment comment1 = new Comment();
+                                comment1.type = Comment.TYPE_NO_MORE;
+                                mCommentList.add(comment1);
+
+                            }
+                            rvComment.getAdapter().notifyDataSetChanged();
+                            mIsOnRefresh = false;
+                        }
+                    });
+                }
+            });
+        }
     }
 
     private void loadData() {
@@ -333,72 +451,17 @@ public class CommentActivity extends AppCompatActivity {
         mTimeBefore = mTimeAfter;
 
         mMessage = (MessagesInfo.Content.Message) getIntent().getSerializableExtra(EXTRA_MESSAGE);
-        mCommentList = new ArrayList<>();
 
-//        HttpUtil.requestSingleMessage(mMessage.mid, new Callback() {
-//            @Override
-//            public void onFailure(Call call, IOException e) {
-//
-//            }
-//
-//            @Override
-//            public void onResponse(Call call, Response response) throws IOException {
-//
-//            }
-//        });
 
-        HttpUtil.requestCommentsBefore(mMessage.mid, mTimeBefore, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
 
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                CommentsInfo commentsInfo = ResponseUtil.getCommentsInfo(response);
-                mCommentList.addAll(0, commentsInfo.content.commentList);
-                LogUtil.d(TAG, "loadData: comment num = " + mCommentList.size());
-                if (mCommentList.size() != 0) {
-                    mTimeAfter = mCommentList.get(0).tmCreated + 1;
-                    mTimeBefore = mCommentList.get(mCommentList.size() - 1).tmCreated - 1;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            rvComment.getAdapter().notifyDataSetChanged();
-                        }
-                    });
-                } else {
-                    mTimeAfter = new Date().getTime();
-                    mTimeBefore = mTimeAfter;
-                }
-            }
-        });
     }
 
-    private void initList() {
-//        mList = new ArrayList<>();
-//        for (int i = 0; i < 30; i++) {
-//            mList.add("hhhhh " + i);
-//        }
-    }
 
     public static void actionStart(Context context, MessagesInfo.Content.Message message) {
         Intent intent = new Intent(context, CommentActivity.class);
         intent.putExtra(EXTRA_MESSAGE, message);
         context.startActivity(intent);
     }
-
-//    public static void actionStartBySharingElement(Activity activity, int messageId, List<View> sharedViews) {
-//        Intent intent = new Intent(activity, CommentActivity.class);
-//        intent.putExtra(EXTRA_MESSAGE, messageId);
-//
-//        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-//                activity
-//                , new Pair<View, String>(sharedViews.get(0), "tocommentactivity")
-//                , new Pair<View, String>(sharedViews.get(1), "tocommentactivity")
-//        );
-//        activity.startActivity(intent, options.toBundle());
-//    }
 
     public static void actionStartByTransition(Activity activity, MessagesInfo.Content.Message message) {
         Intent intent = new Intent(activity, CommentActivity.class);
@@ -448,5 +511,6 @@ public class CommentActivity extends AppCompatActivity {
             Toast.makeText(CommentActivity.this, "评论内容为空", Toast.LENGTH_SHORT).show();
         }
     }
+
 
 }

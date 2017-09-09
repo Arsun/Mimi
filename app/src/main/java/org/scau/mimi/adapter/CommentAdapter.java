@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.scau.mimi.R;
+import org.scau.mimi.gson.Comment;
 import org.scau.mimi.gson.CommentsInfo;
 import org.scau.mimi.util.TextUtil;
 
@@ -21,9 +22,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    List<CommentsInfo.Content.Comment> mComments;
+    private static final int TYPE_CONTENT = 0;
+    private static final int TYPE_HEADER = 1;
+    private static final int TYPE_FOOTER = 2;
+    private static final int TYPE_NO_MORE = 3;
 
-    public CommentAdapter(List<CommentsInfo.Content.Comment> comments) {
+    List<Comment> mComments;
+
+    public CommentAdapter(List<Comment> comments) {
         mComments = comments;
     }
 
@@ -43,26 +49,75 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             tvCommentTime = (TextView) itemView.findViewById(R.id.tv_comment_time);
         }
 
-        public void bind(CommentsInfo.Content.Comment comment) {
+        public void bind(Comment comment) {
             tvCommentContent.setText(comment.content);
             tvCommentNickname.setText(comment.user.nname);
             tvCommentTime.setText(TextUtil.dateToString(new Date(comment.tmCreated)));
         }
 
     }
+
+    static class CommentHeader extends RecyclerView.ViewHolder {
+
+        public CommentHeader(View itemView) {
+            super(itemView);
+        }
+    }
+
+    static class CommentFooter extends RecyclerView.ViewHolder {
+
+        public CommentFooter(View itemView) {
+            super(itemView);
+        }
+    }
+
+    static class CommentNoMore extends RecyclerView.ViewHolder {
+
+        public CommentNoMore(View itemView) {
+            super(itemView);
+        }
+    }
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_comment, parent, false);
-        return new CommentViewHolder(view);
+        View view = null;
+        if (viewType == TYPE_CONTENT) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_comment, parent, false);
+            return new CommentViewHolder(view);
+        } else if (viewType == TYPE_HEADER) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_comment_header, parent, false);
+            return new CommentHeader(view);
+        } else if (viewType == TYPE_FOOTER) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_comment_footer, parent, false);
+            return new CommentFooter(view);
+        } else if (viewType == TYPE_NO_MORE) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_comment_no_more, parent, false);
+            return new CommentNoMore(view);
+        }
+        return null;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((CommentViewHolder)holder).bind(mComments.get(position));
+        if (holder instanceof CommentViewHolder) {
+            ((CommentViewHolder)holder).bind(mComments.get(position));
+        }
     }
 
     @Override
     public int getItemCount() {
         return mComments.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        int type = mComments.get(position).type;
+        if ( type == TYPE_HEADER) {
+            return TYPE_HEADER;
+        } else if (type == TYPE_FOOTER) {
+            return TYPE_FOOTER;
+        } else if (type == TYPE_NO_MORE) {
+            return TYPE_NO_MORE;
+        }
+        return TYPE_CONTENT;
     }
 }

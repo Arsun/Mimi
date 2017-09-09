@@ -13,13 +13,16 @@ import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 
 import org.scau.mimi.R;
+import org.scau.mimi.SingleInstance.MessageLab;
 import org.scau.mimi.activity.MainActivity;
 import org.scau.mimi.adapter.MomentAdapter;
 import org.scau.mimi.base.BaseFragment;
 import org.scau.mimi.gson.MessagesInfo;
 import org.scau.mimi.util.HttpUtil;
 import org.scau.mimi.util.LogUtil;
+import org.scau.mimi.util.NetworkUtil;
 import org.scau.mimi.util.ResponseUtil;
+import org.scau.mimi.util.ToastUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,7 +41,7 @@ public class MomentFragment extends BaseFragment {
 
     private static final String TAG = "MomentFragment";
 
-    private List<MessagesInfo.Content.Message> mMessageList;
+    private MessageLab mMessageLab;
 
     //Views;
     private RecyclerView rvMoment;
@@ -77,7 +80,7 @@ public class MomentFragment extends BaseFragment {
 
     @Override
     protected void initVariables() {
-        mMessageList = new ArrayList<>();
+        mMessageLab = MessageLab.getInstance();
         mTimeAfter = new Date().getTime();
         mTimeBefore = mTimeAfter;
         LogUtil.d(TAG, "initTimeAfter: " + mTimeAfter);
@@ -88,95 +91,166 @@ public class MomentFragment extends BaseFragment {
     protected void initViews(View view) {
         rvMoment = (RecyclerView) view.findViewById(R.id.rv_moment);
         trlRefreshMoment = (TwinklingRefreshLayout) view.findViewById(R.id.trl_refresh_moment);
-        rvMoment.setAdapter(new MomentAdapter(mMessageList));
+        rvMoment.setAdapter(new MomentAdapter(mMessageLab.getMessageList()));
         rvMoment.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         trlRefreshMoment.setOnRefreshListener(new RefreshListenerAdapter() {
             @Override
             public void onRefresh(TwinklingRefreshLayout refreshLayout) {
                 LogUtil.d(TAG, "onRefresh: " + mTimeAfter);
-                HttpUtil.requestMessagesAfter(mTimeAfter, new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        LogUtil.d(TAG, "failed to request messages.");
-                        getActivity().runOnUiThread(new Runnable() {
+                if (NetworkUtil.isNetworkAvailable(getActivity())) {
+
+                    if (mMessageLab.getMessageList().size() != 0) {
+                        HttpUtil.requestMessagesAfter(mTimeAfter, new Callback() {
                             @Override
-                            public void run() {
-                                trlRefreshMoment.finishRefreshing();
+                            public void onFailure(Call call, IOException e) {
+                                LogUtil.d(TAG, "failed to request messages.");
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ToastUtil.toastWhenOnUiThread("加载失败");
+                                        trlRefreshMoment.finishRefreshing();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onResponse(Call call, Response response) throws IOException {
+                                MessagesInfo messagesInfo = ResponseUtil
+                                        .getMessagesInfo(response);
+                                final List<MessagesInfo.Content.Message> messages = messagesInfo.content.messageList;
+                                mMessageLab.addMessages(0, messages);
+                                if (mMessageLab.getSize() != 0) {
+                                    mTimeAfter = mMessageLab.getTimeAfter();
+                                    mTimeBefore = mMessageLab.getTimeBefore();
+                                    LogUtil.d(TAG, "newTimeAfter: " + mTimeAfter);
+                                }
+
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (messages.size() != 0) {
+                                            rvMoment.getAdapter().notifyItemRangeInserted(0, messages.size());
+                                        }
+                                        trlRefreshMoment.finishRefreshing();
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        HttpUtil.requestMessagesBefore(mTimeBefore, new Callback() {
+                            @Override
+                            public void onFailure(Call call, IOException e) {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ToastUtil.toastWhenOnUiThread("加载失败");
+                                        trlRefreshMoment.finishRefreshing();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onResponse(Call call, Response response) throws IOException {
+                                MessagesInfo messagesInfo = ResponseUtil
+                                        .getMessagesInfo(response);
+                                final List<MessagesInfo.Content.Message> messages = messagesInfo.content.messageList;
+                                mMessageLab.addMessages(0, messages);
+                                if (mMessageLab.getSize() != 0) {
+                                    mTimeAfter = mMessageLab.getTimeAfter();
+                                    mTimeBefore = mMessageLab.getTimeBefore();
+                                    LogUtil.d(TAG, "newTimeAfter: " + mTimeAfter);
+                                }
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (messages.size() != 0) {
+                                            trlRefreshMoment.setEnableLoadmore(true);
+                                            rvMoment.getAdapter().notifyItemRangeInserted(
+                                                    mMessageLab.getSize() - 1, messages.size());
+                                        }
+                                        trlRefreshMoment.finishRefreshing();
+
+                                    }
+                                });
                             }
                         });
                     }
 
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        MessagesInfo messagesInfo = ResponseUtil
-                                .getMessagesInfo(response);
-                        List<MessagesInfo.Content.Message> messages = messagesInfo.content.messageList;
-                        mMessageList.addAll(0, messages);
-                        mTimeAfter = mMessageList.get(0).tmCreated + 1;
-                        mTimeBefore = mMessageList.get(mMessageList.size() - 1).tmCreated - 1;
-                        LogUtil.d(TAG, "newTimeAfter: " + mTimeAfter);
-
-//                        for (int i = 0; i < messages.size(); i++) {
-//                            if (i != messages.size() - 1) {
-//                                if (messages.get(i).mid != messages.get(i + 1).mid) {
-//                                    mMessageList.add(messages.get(i));
-//                                }
-//                            } else {
-//                                mMessageList.add(messages.get(i));
-//                            }
-//                        }
-
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                rvMoment.getAdapter().notifyDataSetChanged();
-                                trlRefreshMoment.finishRefreshing();
-                            }
-                        });
-                    }
-                });
+                } else {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ToastUtil.toastWhenOnUiThread("网络不可用");
+                            trlRefreshMoment.finishRefreshing();
+                        }
+                    });
+                }
 
             }
 
             @Override
             public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
                 LogUtil.d(TAG, "onLoadMore: " + mTimeBefore);
-                HttpUtil.requestMessagesBefore(mTimeBefore, new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        LogUtil.d(TAG, "failed to load more.");
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                trlRefreshMoment.finishLoadmore();
-                            }
-                        });
-                    }
+                if (NetworkUtil.isNetworkAvailable(getActivity())) {
 
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        MessagesInfo messagesInfo = ResponseUtil.getMessagesInfo(response);
-                        List<MessagesInfo.Content.Message> messages = messagesInfo.content.messageList;
-                        mMessageList.addAll(messages);
-                        mTimeAfter = mMessageList.get(0).tmCreated + 1;
-                        mTimeBefore = mMessageList.get(mMessageList.size() - 1).tmCreated - 1;
-                        LogUtil.d(TAG, "newTimeBefore: " + mTimeBefore);
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                rvMoment.getAdapter().notifyDataSetChanged();
-                                trlRefreshMoment.finishLoadmore();
+                    HttpUtil.requestMessagesBefore(mTimeBefore, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            LogUtil.d(TAG, "failed to load more.");
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ToastUtil.toastWhenOnUiThread("加载失败");
+                                    trlRefreshMoment.finishLoadmore();
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            MessagesInfo messagesInfo = ResponseUtil.getMessagesInfo(response);
+                            final List<MessagesInfo.Content.Message> messages = messagesInfo.content.messageList;
+                            mMessageLab.addMessages(mMessageLab.getSize() - 1,messages);
+                            if (mMessageLab.getSize() != 0) {
+                                mTimeAfter = mMessageLab.getTimeAfter();
+                                mTimeBefore = mMessageLab.getTimeBefore();
+                                LogUtil.d(TAG, "newTimeBefore: " + mTimeBefore);
                             }
-                        });
-                    }
-                });
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (messages.size() != 0) {
+                                        rvMoment.getAdapter().notifyItemRangeInserted(
+                                                mMessageLab.getSize() - 1, messages.size());
+                                    }
+                                    trlRefreshMoment.finishLoadmore();
+                                }
+                            });
+                        }
+                    });
+
+                } else {
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ToastUtil.toastWhenOnUiThread("网络不可用");
+                            trlRefreshMoment.finishLoadmore();
+                        }
+                    });
+
+                }
             }
         });
 
-//        trlRefreshMoment.startRefresh();
+        if (mMessageLab.getSize() == 0) {
+            trlRefreshMoment.setEnableLoadmore(false);
+        }
+        trlRefreshMoment.startRefresh();
 
-        trlRefreshMoment.onLoadMore(trlRefreshMoment);
+
+//        trlRefreshMoment.onLoadMore(trlRefreshMoment);
 
 
 //        rvMoment.setOnTouchListener(new View.OnTouchListener() {

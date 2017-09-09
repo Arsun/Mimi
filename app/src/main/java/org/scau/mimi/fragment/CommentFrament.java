@@ -34,7 +34,7 @@ public class CommentFrament extends BaseFragment {
 
     //Variables
     //Test
-    private List<CommentsInfo.Content.Comment> mCommentList;
+//    private List<CommentsInfo.Content.Comment> mCommentList;
 
 
     @Nullable
@@ -55,19 +55,19 @@ public class CommentFrament extends BaseFragment {
 
     @Override
     protected void initViews(View view) {
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.tb_comment_toolbar);
-//        tvTest = (TextView) view.findViewById(R.id.tv_test);
-//        String s = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-//        tvTest.setText(s + s + s + s + s + s + s + s);
-        rvComment = (RecyclerView) view.findViewById(R.id.rv_comment);
-        rvComment.setLayoutManager(new LinearLayoutManager(getActivity()));
-        initList();
-        rvComment.setAdapter(new CommentAdapter(mCommentList));
-
-        ctbl = (CollapsingToolbarLayout) view.findViewById(R.id.ctbl_comment_collapsing_toolbar);
-//        ctbl.setTitle("enenene");
-
-        ((CommentActivity)getActivity()).setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) view.findViewById(R.id.tb_comment_toolbar);
+////        tvTest = (TextView) view.findViewById(R.id.tv_test);
+////        String s = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+////        tvTest.setText(s + s + s + s + s + s + s + s);
+//        rvComment = (RecyclerView) view.findViewById(R.id.rv_comment);
+//        rvComment.setLayoutManager(new LinearLayoutManager(getActivity()));
+//        initList();
+//        rvComment.setAdapter(new CommentAdapter(mCommentList));
+//
+//        ctbl = (CollapsingToolbarLayout) view.findViewById(R.id.ctbl_comment_collapsing_toolbar);
+////        ctbl.setTitle("enenene");
+//
+//        ((CommentActivity)getActivity()).setSupportActionBar(toolbar);
 
     }
 

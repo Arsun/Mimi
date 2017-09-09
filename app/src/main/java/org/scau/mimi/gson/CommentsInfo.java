@@ -25,27 +25,6 @@ public class CommentsInfo {
 
         public MessagesInfo.Content.Message message;
 
-        public class Comment {
-            public int cid;
 
-            public int mid;
-
-            public String rcid;
-
-            public int commentVal;
-
-            public LoginInfo.Content.User user;
-
-            public String content;
-
-            public long tmCreated;
-
-            public int likeCount;
-
-            public boolean isFake;
-
-            public String fakeName;
-
-        }
     }
 }
